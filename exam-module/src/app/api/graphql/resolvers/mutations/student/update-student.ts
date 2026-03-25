@@ -25,7 +25,7 @@ export const updateStudent: MutationResolvers["updateStudent"] = async (
 
   if (name !== undefined && name !== null) patch.name = name;
   if (email !== undefined && email !== null) patch.email = email;
-  if (classId !== undefined) patch.classId = classId;
+  if (classId !== undefined && classId !== null) patch.classId = classId;
 
   if (Object.keys(patch).length > 0) {
     await db.update(studentsTable).set(patch).where(eq(studentsTable.id, id));
@@ -49,4 +49,3 @@ export const updateStudent: MutationResolvers["updateStudent"] = async (
     updatedAt: epochToISOString(row.updatedAt),
   };
 };
-

@@ -24,7 +24,7 @@ export const updateProctorLog: MutationResolvers["updateProctorLog"] = async (
   } = {};
 
   // examId is optional in GraphQL and nullable in DB
-  if (examId !== undefined) patch.examId = examId;
+  if (examId !== undefined && examId !== null) patch.examId = examId;
   if (studentId !== undefined && studentId !== null)
     patch.studentId = studentId;
   if (eventType !== undefined && eventType !== null)

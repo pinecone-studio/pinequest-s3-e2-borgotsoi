@@ -55,7 +55,7 @@ export type ExamSession = {
   examId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
   startTime: Scalars['String']['output'];
-  status: Scalars['String']['output'];
+  status?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['String']['output'];
 };
 
@@ -422,7 +422,7 @@ export type ExamSessionResolvers<ContextType = any, ParentType extends Resolvers
   examId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 

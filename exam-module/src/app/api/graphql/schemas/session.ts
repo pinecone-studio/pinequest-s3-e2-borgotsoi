@@ -8,7 +8,7 @@ export const sessionTypeDefs = `
     description: String!
     startTime: String!
     endTime: String!
-    status: String!
+    status: String
     createdAt: String!
     updatedAt: String!
   }
