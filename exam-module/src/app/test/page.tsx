@@ -3,10 +3,15 @@
 import { useProctor } from "@/providers/ProctorProvider";
 import { useAudioProctor } from "@/providers/SpeechRecognizeProvider";
 
-import { useRef, useCallback, useEffect, useState } from "react";
+import { useRef, useCallback, useEffect, useState, use } from "react";
 import { ProctoringDashboard } from "./_components/ProctoringDashboard";
 
-export default function ExamPage({ params }: { params: { id: string } }) {
+export default function ExamPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioCanvasRef = useRef<HTMLCanvasElement>(null);
   const lastFlagTime = useRef<Record<string, number>>({});
@@ -61,14 +66,14 @@ export default function ExamPage({ params }: { params: { id: string } }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            query: `mutation { createFlag(attemptId: "${params.id}", type: "${type}") }`,
+            query: `mutation { createFlag(attemptId: "${id}", type: "${type}") }`,
           }),
         });
       } catch (e) {
         console.error("Failed to report proctor flag:", e);
       }
     },
-    [params.id],
+    [id],
   );
 
   // 3. Initialize AI Hooks
@@ -83,9 +88,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
           <h1 className="text-xl font-bold tracking-tight text-slate-100">
             Midterm Exam: System Architecture
           </h1>
-          <p className="text-xs text-slate-400">
-            Student Session ID: {params.id}
-          </p>
+          <p className="text-xs text-slate-400">Student Session ID: {id}</p>
         </div>
         <div className="flex items-center gap-3">
           {!isCameraReady && (
