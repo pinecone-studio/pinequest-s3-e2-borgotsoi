@@ -1,0 +1,6 @@
+mutation CreateClass($name: String!) {
+  createClass(name: $name) {
+    id
+    name
+  }
+}
