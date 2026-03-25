@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { useProctor } from "@/providers/ProctorProvider";
 import { useAudioProctor } from "@/providers/SpeechRecognizeProvider";
 
@@ -21,11 +23,11 @@ export default function ExamPage({
   const lastFlagTime = useRef<Record<string, number>>({});
   const [isCameraReady, setIsCameraReady] = useState(false);
 
-  const [createProctorLogMutation, { data, loading, error }] =
-    useCreateProctorLogMutation();
+  const [createProctorLogMutation, {}] = useCreateProctorLogMutation();
 
   // 1. Initialize Hardware (Camera & Mic)
   useEffect(() => {
+    const currentVideo = videoRef.current;
     async function setupHardware() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -33,9 +35,9 @@ export default function ExamPage({
           audio: true,
         });
 
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
+        if (currentVideo) {
+          currentVideo.srcObject = stream;
+          currentVideo.onloadedmetadata = () => {
             setIsCameraReady(true);
           };
         }
@@ -50,8 +52,8 @@ export default function ExamPage({
     setupHardware();
 
     return () => {
-      if (videoRef.current?.srcObject) {
-        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      if (currentVideo?.srcObject) {
+        const tracks = (currentVideo.srcObject as MediaStream).getTracks();
         tracks.forEach((track) => track.stop());
       }
     };
@@ -75,7 +77,7 @@ export default function ExamPage({
         },
       });
     },
-    [studentId],
+    [studentId, createProctorLogMutation],
   );
 
   // 3. Initialize AI Hooks
