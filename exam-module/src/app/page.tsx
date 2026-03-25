@@ -10,7 +10,7 @@ export default function ExamsPage() {
   if (loading) {
     return "...loading";
   }
-  if (error) return <p>Алдаа гарлаа: {error.message}</p>;
+  if (error) return <p>Алдаа гарла: {error.message}</p>;
   return (
     <div className="min-h-screen bg-slate-50 p-8 font-sans">
       <div className="max-w-4xl mx-auto">
