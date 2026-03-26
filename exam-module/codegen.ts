@@ -1,7 +1,28 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
+import { mergeTypeDefs } from "@graphql-tools/merge";
+import { print } from "graphql";
+
+import { classTypeDefs } from "./src/app/api/graphql/schemas/class-schema";
+import { examTypeDefs } from "./src/app/api/graphql/schemas/exam-schema";
+import { proctorLogsTypeDefs } from "./src/app/api/graphql/schemas/proctor-logs-schema";
+import { questionsTypeDefs } from "./src/app/api/graphql/schemas/questions-schema";
+import { sessionTypeDefs } from "./src/app/api/graphql/schemas/session";
+import { studentTypeDefs } from "./src/app/api/graphql/schemas/student-schema";
+
+/** Same merge as `schemas/index.ts` — no running server required for deploy/CI. */
+const schema = print(
+  mergeTypeDefs([
+    examTypeDefs,
+    classTypeDefs,
+    studentTypeDefs,
+    sessionTypeDefs,
+    proctorLogsTypeDefs,
+    questionsTypeDefs,
+  ]),
+);
 
 const config: CodegenConfig = {
-  schema: "http://localhost:3000/api/graphql",
+  schema,
   documents: ["src/**/*.graphql"],
   generates: {
     "./src/gql/graphql.tsx": {
