@@ -1,0 +1,6 @@
+query GetExams {
+  exams {
+    id
+    name
+  }
+}
