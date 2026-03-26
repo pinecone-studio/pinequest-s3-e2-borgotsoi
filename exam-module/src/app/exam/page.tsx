@@ -21,11 +21,12 @@ export default function ShalgaltPage() {
   const [pusherLogs, setPusherLogs] = useState<ProctorLogPayload[]>([]);
 
   const { data, loading, error } = useGetActiveSessionQuery();
-  const { data: proctorData, loading: proctorLoading } =
-    useGetProctorLogsQuery({
+  const { data: proctorData, loading: proctorLoading } = useGetProctorLogsQuery(
+    {
       fetchPolicy: "cache-and-network",
       pollInterval: 5000,
-    });
+    },
+  );
 
   const sessions = useMemo(
     () => data?.getActiveSessions ?? [],
@@ -71,19 +72,20 @@ export default function ShalgaltPage() {
 
       return start > now;
     });
+    console.log("upcoming", upcoming);
 
     const ongoing = sessions.filter((s) => {
       const start = new Date(s.startTime);
       const end = new Date(s.endTime);
       return start <= now && end >= now;
     });
-
+    console.log("ongoing", ongoing);
     const finished = sessions.filter((s) => {
       const end = new Date(s.endTime);
 
       return end < now;
     });
-
+    console.log("finished", finished);
     return { upcoming, ongoing, finished };
   }, [sessions]);
 
@@ -146,7 +148,7 @@ export default function ShalgaltPage() {
         </div>
 
         <div className="space-y-8">
-          {activeTab === 1 && (
+          {activeTab === 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredAssignments.upcoming.map((item) => (
                 <AssignmentCard

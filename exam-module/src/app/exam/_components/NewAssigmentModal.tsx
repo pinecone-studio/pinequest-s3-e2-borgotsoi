@@ -21,6 +21,16 @@ type FormData = {
   endTime: string;
 };
 
+/** Interprets YYYY-MM-DD + HH:mm as the user's local wall time, returns UTC ISO for the API. */
+function localDateTimeToUtcIso(dateStr: string, timeStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const parts = (timeStr || "00:00").split(":");
+  const hh = Number(parts[0]) || 0;
+  const mm = Number(parts[1]) || 0;
+  const ss = Number(parts[2]) || 0;
+  return new Date(y, m - 1, d, hh, mm, ss).toISOString();
+}
+
 export default function NewAssignmentModal({ isOpen, onClose }: Props) {
   const [formData, setFormData] = useState<FormData>({
     examId: "",
@@ -53,8 +63,14 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
     }
 
     const now = new Date();
-    const formattedStart = `${formData.date}T${formData.startTime || "00:00"}:00Z`;
-    const formattedEnd = `${formData.date}T${formData.endTime || "23:59"}:00Z`;
+    const formattedStart = localDateTimeToUtcIso(
+      formData.date,
+      formData.startTime || "00:00",
+    );
+    const formattedEnd = localDateTimeToUtcIso(
+      formData.date,
+      formData.endTime || "23:59",
+    );
 
     const startDate = new Date(formattedStart);
     const endDate = new Date(formattedEnd);
