@@ -65,7 +65,7 @@ export const useProctor = (
               onFlag("no_face_detected");
             }
           }
-        }, 1000); // 2 second check interval
+        }, 3000); // 2 second check interval
       } catch (error) {
         console.error("Proctoring AI Init Error:", error);
       }
