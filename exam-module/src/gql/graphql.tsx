@@ -539,6 +539,14 @@ export type GetExamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetExamsQuery = { __typename?: 'Query', exams: Array<{ __typename?: 'Exam', id: string, name: string }> };
 
+export type GetProctorLogsQueryVariables = Exact<{
+  examId?: InputMaybe<Scalars['ID']['input']>;
+  studentId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type GetProctorLogsQuery = { __typename?: 'Query', proctorLogs: Array<{ __typename?: 'ProctorLog', id: string, examId?: string | null, studentId: string, eventType: string, createdAt: string, updatedAt: string }> };
+
 export type CreateExamMutationVariables = Exact<{
   name: Scalars['String']['input'];
 }>;
@@ -798,6 +806,55 @@ export type GetExamsQueryHookResult = ReturnType<typeof useGetExamsQuery>;
 export type GetExamsLazyQueryHookResult = ReturnType<typeof useGetExamsLazyQuery>;
 export type GetExamsSuspenseQueryHookResult = ReturnType<typeof useGetExamsSuspenseQuery>;
 export type GetExamsQueryResult = Apollo.QueryResult<GetExamsQuery, GetExamsQueryVariables>;
+export const GetProctorLogsDocument = gql`
+    query GetProctorLogs($examId: ID, $studentId: ID) {
+  proctorLogs(examId: $examId, studentId: $studentId) {
+    id
+    examId
+    studentId
+    eventType
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetProctorLogsQuery__
+ *
+ * To run a query within a React component, call `useGetProctorLogsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProctorLogsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProctorLogsQuery({
+ *   variables: {
+ *      examId: // value for 'examId'
+ *      studentId: // value for 'studentId'
+ *   },
+ * });
+ */
+export function useGetProctorLogsQuery(baseOptions?: Apollo.QueryHookOptions<GetProctorLogsQuery, GetProctorLogsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProctorLogsQuery, GetProctorLogsQueryVariables>(GetProctorLogsDocument, options);
+      }
+export function useGetProctorLogsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProctorLogsQuery, GetProctorLogsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProctorLogsQuery, GetProctorLogsQueryVariables>(GetProctorLogsDocument, options);
+        }
+// @ts-ignore
+export function useGetProctorLogsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetProctorLogsQuery, GetProctorLogsQueryVariables>): Apollo.UseSuspenseQueryResult<GetProctorLogsQuery, GetProctorLogsQueryVariables>;
+export function useGetProctorLogsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProctorLogsQuery, GetProctorLogsQueryVariables>): Apollo.UseSuspenseQueryResult<GetProctorLogsQuery | undefined, GetProctorLogsQueryVariables>;
+export function useGetProctorLogsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetProctorLogsQuery, GetProctorLogsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetProctorLogsQuery, GetProctorLogsQueryVariables>(GetProctorLogsDocument, options);
+        }
+export type GetProctorLogsQueryHookResult = ReturnType<typeof useGetProctorLogsQuery>;
+export type GetProctorLogsLazyQueryHookResult = ReturnType<typeof useGetProctorLogsLazyQuery>;
+export type GetProctorLogsSuspenseQueryHookResult = ReturnType<typeof useGetProctorLogsSuspenseQuery>;
+export type GetProctorLogsQueryResult = Apollo.QueryResult<GetProctorLogsQuery, GetProctorLogsQueryVariables>;
 export const CreateExamDocument = gql`
     mutation CreateExam($name: String!) {
   createExam(name: $name) {

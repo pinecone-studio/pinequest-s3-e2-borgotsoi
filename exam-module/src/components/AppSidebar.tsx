@@ -7,14 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "./ui/sidebar";
-import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  LayoutGrid,
-  FileText,
-  Settings,
-} from "lucide-react";
+import { Users, LayoutGrid, FileText } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
