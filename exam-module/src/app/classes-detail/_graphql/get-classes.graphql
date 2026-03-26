@@ -1,0 +1,6 @@
+query GetClassesDetailPage {
+  getClasses {
+    id
+    name
+  }
+}
