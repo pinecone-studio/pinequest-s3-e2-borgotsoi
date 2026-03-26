@@ -524,11 +524,6 @@ export type CreateExamSessionMutationMutationVariables = Exact<{
 
 export type CreateExamSessionMutationMutation = { __typename?: 'Mutation', createExamSession: { __typename?: 'ExamSession', createdAt: string, updatedAt: string, startTime: string, status?: string | null, id: string, description: string, endTime: string, class?: { __typename?: 'Class', name: string, id: string } | null, exam?: { __typename?: 'Exam', id: string, name: string } | null } };
 
-export type GetActiveSessionQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetActiveSessionQuery = { __typename?: 'Query', getActiveSessions: Array<{ __typename?: 'ExamSession', id: string, status?: string | null, startTime: string, description: string, createdAt: string, endTime: string, updatedAt: string, class?: { __typename?: 'Class', id: string, name: string } | null, exam?: { __typename?: 'Exam', id: string, name: string } | null }> };
-
 export type GetClassesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -538,6 +533,11 @@ export type GetExamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetExamsQuery = { __typename?: 'Query', exams: Array<{ __typename?: 'Exam', id: string, name: string }> };
+
+export type GetMyClassesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyClassesQuery = { __typename?: 'Query', getClasses: Array<{ __typename?: 'Class', id: string, name: string }> };
 
 export type CreateExamMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -656,62 +656,6 @@ export function useCreateExamSessionMutationMutation(baseOptions?: Apollo.Mutati
 export type CreateExamSessionMutationMutationHookResult = ReturnType<typeof useCreateExamSessionMutationMutation>;
 export type CreateExamSessionMutationMutationResult = Apollo.MutationResult<CreateExamSessionMutationMutation>;
 export type CreateExamSessionMutationMutationOptions = Apollo.BaseMutationOptions<CreateExamSessionMutationMutation, CreateExamSessionMutationMutationVariables>;
-export const GetActiveSessionDocument = gql`
-    query GetActiveSession {
-  getActiveSessions {
-    class {
-      id
-      name
-    }
-    exam {
-      id
-      name
-    }
-    id
-    status
-    startTime
-    description
-    createdAt
-    endTime
-    updatedAt
-  }
-}
-    `;
-
-/**
- * __useGetActiveSessionQuery__
- *
- * To run a query within a React component, call `useGetActiveSessionQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetActiveSessionQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetActiveSessionQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetActiveSessionQuery(baseOptions?: Apollo.QueryHookOptions<GetActiveSessionQuery, GetActiveSessionQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetActiveSessionQuery, GetActiveSessionQueryVariables>(GetActiveSessionDocument, options);
-      }
-export function useGetActiveSessionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetActiveSessionQuery, GetActiveSessionQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetActiveSessionQuery, GetActiveSessionQueryVariables>(GetActiveSessionDocument, options);
-        }
-// @ts-ignore
-export function useGetActiveSessionSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetActiveSessionQuery, GetActiveSessionQueryVariables>): Apollo.UseSuspenseQueryResult<GetActiveSessionQuery, GetActiveSessionQueryVariables>;
-export function useGetActiveSessionSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetActiveSessionQuery, GetActiveSessionQueryVariables>): Apollo.UseSuspenseQueryResult<GetActiveSessionQuery | undefined, GetActiveSessionQueryVariables>;
-export function useGetActiveSessionSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetActiveSessionQuery, GetActiveSessionQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetActiveSessionQuery, GetActiveSessionQueryVariables>(GetActiveSessionDocument, options);
-        }
-export type GetActiveSessionQueryHookResult = ReturnType<typeof useGetActiveSessionQuery>;
-export type GetActiveSessionLazyQueryHookResult = ReturnType<typeof useGetActiveSessionLazyQuery>;
-export type GetActiveSessionSuspenseQueryHookResult = ReturnType<typeof useGetActiveSessionSuspenseQuery>;
-export type GetActiveSessionQueryResult = Apollo.QueryResult<GetActiveSessionQuery, GetActiveSessionQueryVariables>;
 export const GetClassesDocument = gql`
     query GetClasses {
   getClasses {
@@ -798,6 +742,49 @@ export type GetExamsQueryHookResult = ReturnType<typeof useGetExamsQuery>;
 export type GetExamsLazyQueryHookResult = ReturnType<typeof useGetExamsLazyQuery>;
 export type GetExamsSuspenseQueryHookResult = ReturnType<typeof useGetExamsSuspenseQuery>;
 export type GetExamsQueryResult = Apollo.QueryResult<GetExamsQuery, GetExamsQueryVariables>;
+export const GetMyClassesDocument = gql`
+    query GetMyClasses {
+  getClasses {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetMyClassesQuery__
+ *
+ * To run a query within a React component, call `useGetMyClassesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyClassesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyClassesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyClassesQuery(baseOptions?: Apollo.QueryHookOptions<GetMyClassesQuery, GetMyClassesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyClassesQuery, GetMyClassesQueryVariables>(GetMyClassesDocument, options);
+      }
+export function useGetMyClassesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyClassesQuery, GetMyClassesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyClassesQuery, GetMyClassesQueryVariables>(GetMyClassesDocument, options);
+        }
+// @ts-ignore
+export function useGetMyClassesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetMyClassesQuery, GetMyClassesQueryVariables>): Apollo.UseSuspenseQueryResult<GetMyClassesQuery, GetMyClassesQueryVariables>;
+export function useGetMyClassesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyClassesQuery, GetMyClassesQueryVariables>): Apollo.UseSuspenseQueryResult<GetMyClassesQuery | undefined, GetMyClassesQueryVariables>;
+export function useGetMyClassesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyClassesQuery, GetMyClassesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyClassesQuery, GetMyClassesQueryVariables>(GetMyClassesDocument, options);
+        }
+export type GetMyClassesQueryHookResult = ReturnType<typeof useGetMyClassesQuery>;
+export type GetMyClassesLazyQueryHookResult = ReturnType<typeof useGetMyClassesLazyQuery>;
+export type GetMyClassesSuspenseQueryHookResult = ReturnType<typeof useGetMyClassesSuspenseQuery>;
+export type GetMyClassesQueryResult = Apollo.QueryResult<GetMyClassesQuery, GetMyClassesQueryVariables>;
 export const CreateExamDocument = gql`
     mutation CreateExam($name: String!) {
   createExam(name: $name) {

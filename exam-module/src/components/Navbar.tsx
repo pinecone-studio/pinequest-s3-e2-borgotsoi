@@ -9,7 +9,7 @@ export default function Navbar() {
   const pageTitles: Record<string, string> = {
     "/": "Нүүр",
     "/schedule": "Хуваарь",
-    "/classes": "Анги",
+    "/my-classes": "Анги",
     "/exams": "Шалгалт",
     "/materials": "Шалгалтын материал",
     "/settings": "Тохиргоо",
