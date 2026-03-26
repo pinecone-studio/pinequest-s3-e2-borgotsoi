@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { SidebarTrigger } from "./ui/sidebar";
 
 export default function Navbar() {
   const pathname = usePathname();

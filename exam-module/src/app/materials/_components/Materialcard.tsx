@@ -17,7 +17,7 @@ interface MaterialCardProps {
   onClick?: () => void;
 }
 
-export default function MaterialCard({ material, onClick }: MaterialCardProps) {
+export default function MaterialCard({ material }: MaterialCardProps) {
   return (
     <div className="rounded-xl overflow-hidden bg-white shadow-sm cursor-pointer">
       <div className="h-40" style={{ background: material.gradient }} />

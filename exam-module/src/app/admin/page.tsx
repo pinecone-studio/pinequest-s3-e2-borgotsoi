@@ -1,5 +1,5 @@
 "use client";
-import { db } from "@/lib/db";
+import { db } from "@/lib/db";  
 import { useLiveQuery } from "dexie-react-hooks";
 
 export default function TeacherPage() {

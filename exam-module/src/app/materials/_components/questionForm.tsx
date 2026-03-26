@@ -8,7 +8,7 @@ interface QuestionFormProps {
   onDelete: () => void;
 }
 
-export default function QuestionForm({ question, onChange, onDelete }: QuestionFormProps) {
+export default function QuestionForm({ question, onChange }: QuestionFormProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
       <div className="flex items-center justify-between mb-4">

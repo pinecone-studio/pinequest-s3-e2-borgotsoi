@@ -1,0 +1,10 @@
+query GetProctorLogs($examId: ID, $studentId: ID) {
+  proctorLogs(examId: $examId, studentId: $studentId) {
+    id
+    examId
+    studentId
+    eventType
+    createdAt
+    updatedAt
+  }
+}
