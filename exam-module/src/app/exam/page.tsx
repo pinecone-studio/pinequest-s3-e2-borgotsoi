@@ -121,7 +121,6 @@ export default function ShalgaltPage() {
       <NewAssignmentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onAddAssignment={handleAddAssignment}
       />
     </div>
   );
