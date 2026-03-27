@@ -115,20 +115,17 @@ export default function ShalgaltPage() {
 
       return start > now;
     });
-    console.log("upcoming", upcoming);
 
     const ongoing = sessions.filter((s) => {
       const start = new Date(s.startTime);
       const end = new Date(s.endTime);
       return start <= now && end >= now;
     });
-    console.log("ongoing", ongoing);
     const finished = sessions.filter((s) => {
       const end = new Date(s.endTime);
 
       return end < now;
     });
-    console.log("finished", finished);
     return { upcoming, ongoing, finished };
   }, [sessions]);
 
@@ -191,32 +188,19 @@ export default function ShalgaltPage() {
         </div>
 
         <div className="space-y-8">
-          {activeTab === 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredAssignments.upcoming.map((item) => (
-                <AssignmentCard
-                  key={item.id}
-                  title={item.description}
-                  classInfo={item.class?.name || "Тодорхойгүй"}
-                  date={new Date(item.startTime).toLocaleDateString()}
-                  startTime={new Date(item.startTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  endTime={new Date(item.endTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  type="upcoming"
-                />
-              ))}
-            </div>
-          )}
-
-          {activeTab === 1 && (
-            <>
+          {activeTab === 0 &&
+            (filteredAssignments.upcoming.length === 0 ? (
+              <div className="rounded-[24px] border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-gray-500">
+                <p className="font-medium text-gray-700">
+                  Төлөвлөгдсөн шалгалт байхгүй
+                </p>
+                <p className="mt-2 text-sm text-gray-400">
+                  Одоогоор авах шалгалт харагдахгүй байна.
+                </p>
+              </div>
+            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredAssignments.finished.map((item) => (
+                {filteredAssignments.upcoming.map((item) => (
                   <AssignmentCard
                     key={item.id}
                     title={item.description}
@@ -230,13 +214,49 @@ export default function ShalgaltPage() {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
-                    type="finished"
+                    type="upcoming"
                   />
                 ))}
               </div>
-              <ProgressTable />
-            </>
-          )}
+            ))}
+
+          {activeTab === 1 &&
+            (filteredAssignments.finished.length === 0 ? (
+              <div className="rounded-[24px] border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-gray-500">
+                <p className="font-medium text-gray-700">
+                  Дууссан шалгалтын түүх байхгүй
+                </p>
+                <p className="mt-2 text-sm text-gray-400">
+                  Session-ууд дууссан шалгалтад тохирохгүй байна.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredAssignments.finished.map((item) => (
+                    <AssignmentCard
+                      key={item.id}
+                      title={item.description}
+                      classInfo={item.class?.name || "Тодорхойгүй"}
+                      date={new Date(item.startTime).toLocaleDateString()}
+                      startTime={new Date(item.startTime).toLocaleTimeString(
+                        [],
+                        {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        },
+                      )}
+                      endTime={new Date(item.endTime).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      type="finished"
+                    />
+                  ))}
+                </div>
+                <ProgressTable />
+              </>
+            ))}
           {activeTab === 2 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -255,8 +275,13 @@ export default function ShalgaltPage() {
 
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                     {filteredAssignments.ongoing.length === 0 ? (
-                      <div className="col-span-full rounded-[24px] border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-gray-400">
-                        Одоогоор эхэлсэн шалгалт байхгүй.
+                      <div className="col-span-full rounded-[24px] border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-gray-500">
+                        <p className="font-medium text-gray-700">
+                          Идэвхтэй ExamSession байхгүй
+                        </p>
+                        <p className="mt-2 text-sm text-gray-400">
+                          Одоогоор эхэлсэн шалгалт харагдахгүй байна.
+                        </p>
                       </div>
                     ) : (
                       filteredAssignments.ongoing.map((item) => (
