@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,18 +16,26 @@ export function AppSidebar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Defer active-state styling to the client to avoid hydration mismatch
+  const [clientPathname, setClientPathname] = useState<string | null>(null);
+  useEffect(() => {
+    setClientPathname(pathname);
+  }, [pathname]);
+
   const menuItems = [
     // { title: "Нүүр", icon: LayoutDashboard, path: "/" },
     // { title: "Хуваарь", icon: Calendar, path: "/schedule" },
     { title: "Анги", icon: Users, path: "/my-classes" },
     { title: "Шалгалт", icon: LayoutGrid, path: "/exam" },
     { title: "Шалгалтын материал", icon: FileText, path: "/materials" },
+    { title: "Багш", icon: FileText, path: "/employees" },
+    { title: "Шалгалтийн сан", icon: FileText, path: "/library" },
     // { title: "Тохиргоо", icon: Settings, path: "/settings" },
   ];
 
   const renderMenuItems = (items: typeof menuItems) =>
     items.map((item) => {
-      const isActive = pathname === item.path;
+      const isActive = clientPathname === item.path;
       return (
         <SidebarMenuItem key={item.title}>
           <div
