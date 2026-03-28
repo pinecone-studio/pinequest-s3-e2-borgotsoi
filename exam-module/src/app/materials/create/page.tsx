@@ -1,24 +1,57 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { buildQuestionPayload } from "@/app/materials/_components/buildQuestionPayload";
 import { Question } from "@/app/materials/_components/mock";
 import QuestionForm from "@/app/materials/_components/questionForm";
-import { useCreateExamMutation, useCreateQuestionMutation } from "@/gql/graphql";
+import {
+  useCreateExamMutation,
+  useCreateQuestionMutation,
+  useGetExamCreateOptionsQuery,
+  useTopicsBySubjectQuery,
+} from "@/gql/graphql";
 
 export default function CreateMaterialPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [creatorId, setCreatorId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [topicId, setTopicId] = useState("");
   const [questions, setQuestions] = useState<Question[]>([
     { id: 1, text: "", answers: ["", "", ""], score: 2, correctIndex: 0 },
   ]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  const { data: optionsData, loading: optionsLoading } =
+    useGetExamCreateOptionsQuery();
+  const { data: topicsData, loading: topicsLoading } = useTopicsBySubjectQuery({
+    variables: { subjectId },
+    skip: !subjectId,
+  });
+
   const [createExam] = useCreateExamMutation();
   const [createQuestion] = useCreateQuestionMutation();
+
+  useEffect(() => {
+    const staff = optionsData?.staffUsers ?? [];
+    const subjects = optionsData?.subjects ?? [];
+    if (!creatorId && staff[0]) setCreatorId(staff[0].id);
+    if (!subjectId && subjects[0]) setSubjectId(subjects[0].id);
+  }, [optionsData, creatorId, subjectId]);
+
+  useEffect(() => {
+    const list = topicsData?.topics ?? [];
+    if (list.length === 0) {
+      setTopicId("");
+      return;
+    }
+    if (!list.some((t) => t.id === topicId)) {
+      setTopicId(list[0]!.id);
+    }
+  }, [topicsData, topicId]);
 
   const fillDemoMathExam = () => {
     setError(null);
@@ -72,6 +105,10 @@ export default function CreateMaterialPage() {
       setError("Шалгалтын нэр оруулна уу.");
       return;
     }
+    if (!creatorId || !subjectId || !topicId) {
+      setError("Багш, хичээлийн чиглэл, сэдэв сонгоно уу.");
+      return;
+    }
 
     const payloads: NonNullable<ReturnType<typeof buildQuestionPayload>>[] = [];
     for (let i = 0; i < questions.length; i++) {
@@ -87,7 +124,9 @@ export default function CreateMaterialPage() {
 
     setSaving(true);
     try {
-      const examRes = await createExam({ variables: { name } });
+      const examRes = await createExam({
+        variables: { name, creatorId, subjectId, topicId },
+      });
       const examId = examRes.data?.createExam.id;
       if (!examId) {
         throw new Error("Шалгалт үүсгэгдсэнгүй.");
@@ -129,15 +168,79 @@ export default function CreateMaterialPage() {
           </div>
         )}
 
-        {/* Title */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-3">Шалгалтын материал нэр оруулна уу</p>
+        {/* Title + exam metadata */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 space-y-4">
+          <p className="text-sm font-medium text-gray-700">Шалгалтын материал нэр оруулна уу</p>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Жишээ нь : 12-р анги Бүлэг сэдвийн шалгалт"
             className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none text-gray-700"
           />
+          <div className="grid gap-3 sm:grid-cols-3">
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-gray-600">Багш</span>
+              <select
+                value={creatorId}
+                onChange={(e) => setCreatorId(e.target.value)}
+                disabled={optionsLoading || !(optionsData?.staffUsers?.length)}
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white disabled:opacity-50"
+              >
+                <option value="">
+                  {optionsLoading ? "Уншиж байна…" : "Сонгох"}
+                </option>
+                {(optionsData?.staffUsers ?? []).map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} {u.lastName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-gray-600">Чиглэл</span>
+              <select
+                value={subjectId}
+                onChange={(e) => {
+                  setSubjectId(e.target.value);
+                  setTopicId("");
+                }}
+                disabled={optionsLoading || !(optionsData?.subjects?.length)}
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white disabled:opacity-50"
+              >
+                <option value="">
+                  {optionsLoading ? "Уншиж байна…" : "Сонгох"}
+                </option>
+                {(optionsData?.subjects ?? []).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5 text-sm">
+              <span className="text-gray-600">Сэдэв</span>
+              <select
+                value={topicId}
+                onChange={(e) => setTopicId(e.target.value)}
+                disabled={!subjectId || topicsLoading || !(topicsData?.topics?.length)}
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white disabled:opacity-50"
+              >
+                <option value="">
+                  {!subjectId
+                    ? "Эхлээд чиглэл сонгоно уу"
+                    : topicsLoading
+                      ? "Уншиж байна…"
+                      : "Сонгох"}
+                </option>
+                {(topicsData?.topics ?? []).map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                    {t.grade != null ? ` (анг.${t.grade})` : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
 
         {/* Questions */}

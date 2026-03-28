@@ -3,6 +3,7 @@
 export const runtime = "edge";
 
 import { normalizeVariationLabel } from "@/app/materials/_components/variation";
+import { useLiveKitExamPublisher } from "@/hooks/useLiveKitExamPublisher";
 import { useProctor } from "@/providers/ProctorProvider";
 import { useAudioProctor } from "@/providers/SpeechRecognizeProvider";
 
@@ -81,6 +82,9 @@ export default function ExamPage({
   const audioCanvasRef = useRef<HTMLCanvasElement>(null);
   const lastFlagTime = useRef<Record<string, number>>({});
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const [examMediaStream, setExamMediaStream] = useState<MediaStream | null>(
+    null,
+  );
 
   const [createProctorLogMutation, {}] = useCreateProctorLogMutation();
   const [submitExamAnswersMutation, { loading: submitMutationLoading }] =
@@ -224,6 +228,7 @@ export default function ExamPage({
         variables: {
           studentId,
           examId: exam,
+          sessionId: examSessionId || undefined,
           answers: payload,
         },
       });
@@ -236,7 +241,7 @@ export default function ExamPage({
     } finally {
       submittingRef.current = false;
     }
-  }, [effectiveExamId, studentId, submitExamAnswersMutation]);
+  }, [effectiveExamId, studentId, examSessionId, submitExamAnswersMutation]);
 
   const performSubmitRef = useRef(performSubmit);
   performSubmitRef.current = performSubmit;
@@ -269,6 +274,7 @@ export default function ExamPage({
     if (!node) {
       cameraStreamRef.current?.getTracks().forEach((t) => t.stop());
       cameraStreamRef.current = null;
+      setExamMediaStream(null);
       setIsCameraReady(false);
       return;
     }
@@ -285,6 +291,7 @@ export default function ExamPage({
           return;
         }
         cameraStreamRef.current = stream;
+        setExamMediaStream(stream);
         node.srcObject = stream;
         node.onloadedmetadata = () => {
           setIsCameraReady(true);
@@ -314,16 +321,27 @@ export default function ExamPage({
           eventType: type,
           studentId,
           examId: effectiveExamId || undefined,
+          sessionId: examSessionId || undefined,
         },
       });
     },
-    [studentId, effectiveExamId, createProctorLogMutation],
+    [studentId, effectiveExamId, examSessionId, createProctorLogMutation],
   );
 
   const examWindowActive = legacyLink || sessionTimeState === "active";
 
   useProctor(videoRef, reportFlag, examWindowActive);
   useAudioProctor(reportFlag, audioCanvasRef, examWindowActive);
+
+  useLiveKitExamPublisher({
+    roomName: examSessionId || null,
+    identity: studentId,
+    mediaStream: examMediaStream,
+    enabled:
+      Boolean(examSessionId && studentId) &&
+      examWindowActive &&
+      Boolean(examMediaStream),
+  });
 
   if (!linkValid) {
     return (

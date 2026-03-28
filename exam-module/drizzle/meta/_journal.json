@@ -22,6 +22,20 @@
       "when": 1774513616468,
       "tag": "0002_tidy_ben_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1774700069235,
+      "tag": "0003_cold_skaar",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1774711531462,
+      "tag": "0004_tan_killmonger",
+      "breakpoints": true
     }
   ]
 }
