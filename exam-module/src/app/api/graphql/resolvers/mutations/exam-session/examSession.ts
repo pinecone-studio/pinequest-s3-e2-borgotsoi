@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import {
   exams as examsTable,
   examSessions as examSessionsTable,
+  studentSessionStatus as studentSessionStatusTable,
   students as studentsTable,
 } from "@/db/schema";
 import { sendExamInviteEmails } from "@/lib/send-exam-invite-emails";
@@ -57,6 +58,17 @@ export const createExamSession: MutationResolvers["createExamSession"] = async (
     .select()
     .from(studentsTable)
     .where(eq(studentsTable.classId, created.classId));
+
+  if (classStudents.length > 0) {
+    await db.insert(studentSessionStatusTable).values(
+      classStudents.map((s) => ({
+        sessionId: created.id,
+        studentId: s.id,
+        isStarted: false,
+        isFinished: false,
+      })),
+    );
+  }
 
   const recipients = classStudents
     .filter((s) => s.email?.trim())

@@ -1,4 +1,4 @@
-query GetExamSessionForActiveExam($id: ID!) {
+query GetExamSessionForActiveExam($id: ID!, $studentId: ID!) {
   examSession(id: $id) {
     id
     examId
@@ -6,5 +6,9 @@ query GetExamSessionForActiveExam($id: ID!) {
     endTime
     description
     status
+  }
+  studentExamSessionStatus(sessionId: $id, studentId: $studentId) {
+    isStarted
+    isFinished
   }
 }

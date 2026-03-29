@@ -14,7 +14,14 @@ import { useProctorLogsPusher } from "@/hooks/useProctorLogsPusher";
 import { cn } from "@/lib/utils";
 
 const teacherReconnectPolicy = new DefaultReconnectPolicy([
-  0, 300, 600, 1_200, 2_400, 4_800, 7_000, ...Array(20).fill(7_000),
+  0,
+  300,
+  600,
+  1_200,
+  2_400,
+  4_800,
+  7_000,
+  ...Array(20).fill(7_000),
 ]);
 
 const HIGHLIGHT_MS = 14_000;
@@ -134,7 +141,9 @@ function ProctorLiveKitSession({
         else setTokenError("Missing token");
       } catch (e) {
         if (!cancelled) {
-          setTokenError(e instanceof Error ? e.message : "Token request failed");
+          setTokenError(
+            e instanceof Error ? e.message : "Token request failed",
+          );
         }
       }
     })();
@@ -194,8 +203,8 @@ function ProctorLiveKitSession({
           <RemoteCameraGrid highlightedIds={highlightedIds} />
           {highlightedIds.size === 0 ? null : (
             <p className="mt-3 text-xs text-gray-500">
-              Улаан хүрээтэй тайл нь сүүлийн AI/Pusher анхааруулгатай таарсан сурагчийн ID-тай
-              таарна.
+              Улаан хүрээтэй тайл нь сүүлийн AI/Pusher анхааруулгатай таарсан
+              сурагчийн ID-тай таарна.
             </p>
           )}
         </div>
