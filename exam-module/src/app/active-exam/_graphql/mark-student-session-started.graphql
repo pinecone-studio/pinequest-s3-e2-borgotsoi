@@ -1,0 +1,3 @@
+mutation MarkStudentExamSessionStarted($sessionId: ID!, $studentId: ID!) {
+  markStudentExamSessionStarted(sessionId: $sessionId, studentId: $studentId)
+}

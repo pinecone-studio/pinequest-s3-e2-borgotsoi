@@ -8,6 +8,7 @@ import {
   useCreateProctorLogMutation,
   useGetExamSessionForActiveExamQuery,
   useGetActiveExamTakingQuery,
+  useMarkStudentExamSessionStartedMutation,
   useSubmitExamAnswersMutation,
 } from "@/gql/graphql";
 import { useSearchParams } from "next/navigation";
@@ -51,8 +52,8 @@ export function ActiveExamPageContent() {
     loading: sessionLoading,
     error: sessionError,
   } = useGetExamSessionForActiveExamQuery({
-    variables: { id: examSessionId },
-    skip: !examSessionId,
+    variables: { id: examSessionId, studentId },
+    skip: !examSessionId || !studentId,
   });
 
   const sessionFetchIncomplete =
@@ -67,6 +68,9 @@ export function ActiveExamPageContent() {
   }, [examSessionId]);
 
   const session = sessionData?.examSession ?? null;
+  const sessionAlreadyFinished = Boolean(
+    sessionData?.studentExamSessionStatus?.isFinished,
+  );
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -77,8 +81,35 @@ export function ActiveExamPageContent() {
   );
 
   const [createProctorLogMutation, {}] = useCreateProctorLogMutation();
+  const [markStudentExamSessionStartedMutation] =
+    useMarkStudentExamSessionStartedMutation();
   const [submitExamAnswersMutation, { loading: submitMutationLoading }] =
     useSubmitExamAnswersMutation();
+
+  const sessionIdForMarkStarted = session?.id;
+
+  useEffect(() => {
+    if (
+      !sessionLink ||
+      !examSessionId ||
+      !studentId ||
+      !sessionIdForMarkStarted ||
+      sessionAlreadyFinished
+    )
+      return;
+    void markStudentExamSessionStartedMutation({
+      variables: { sessionId: examSessionId, studentId },
+    }).catch((err) => {
+      console.error("[markStudentExamSessionStarted]", err);
+    });
+  }, [
+    sessionLink,
+    examSessionId,
+    studentId,
+    sessionIdForMarkStarted,
+    sessionAlreadyFinished,
+    markStudentExamSessionStartedMutation,
+  ]);
 
   const [choices, setChoices] = useState<Record<string, number>>({});
   const [chosenVariation, setChosenVariation] = useState<string | null>(null);
@@ -127,11 +158,18 @@ export function ActiveExamPageContent() {
     if (!effectiveExamId) return true;
     if (legacyLink) return false;
     if (!sessionLink || sessionTimeState === null) return true;
+    if (sessionAlreadyFinished) return true;
     if (sessionTimeState === "not_started") return true;
     if (sessionTimeState === "ended" && !wasSessionActiveRef.current)
       return true;
     return false;
-  }, [effectiveExamId, legacyLink, sessionLink, sessionTimeState]);
+  }, [
+    effectiveExamId,
+    legacyLink,
+    sessionLink,
+    sessionTimeState,
+    sessionAlreadyFinished,
+  ]);
 
   const shouldLoadExamContent = !skipExamTakingQuery;
 
@@ -200,7 +238,12 @@ export function ActiveExamPageContent() {
   }, [displayQuestions]);
 
   const performSubmit = useCallback(async () => {
-    if (submittedRef.current || submittingRef.current) return;
+    if (
+      submittedRef.current ||
+      submittingRef.current ||
+      sessionAlreadyFinished
+    )
+      return;
     const exam = effectiveExamId;
     if (!exam || !studentId) return;
     submittingRef.current = true;
@@ -235,13 +278,19 @@ export function ActiveExamPageContent() {
     } finally {
       submittingRef.current = false;
     }
-  }, [effectiveExamId, studentId, examSessionId, submitExamAnswersMutation]);
+  }, [
+    effectiveExamId,
+    studentId,
+    examSessionId,
+    sessionAlreadyFinished,
+    submitExamAnswersMutation,
+  ]);
 
   const performSubmitRef = useRef(performSubmit);
   performSubmitRef.current = performSubmit;
 
   useEffect(() => {
-    if (!sessionLink || !session || submitted) return;
+    if (!sessionLink || !session || submitted || sessionAlreadyFinished) return;
     const endMs = Date.parse(session.endTime);
     const delay = endMs - Date.now();
     if (delay <= 0) {
@@ -250,14 +299,14 @@ export function ActiveExamPageContent() {
     }
     const id = window.setTimeout(() => void performSubmitRef.current(), delay);
     return () => window.clearTimeout(id);
-  }, [sessionLink, session, submitted]);
+  }, [sessionLink, session, submitted, sessionAlreadyFinished]);
 
   useEffect(() => {
-    if (!sessionLink || !session || submitted) return;
+    if (!sessionLink || !session || submitted || sessionAlreadyFinished) return;
     const endMs = Date.parse(session.endTime);
     if (now < endMs) return;
     void performSubmitRef.current();
-  }, [sessionLink, session, now, submitted]);
+  }, [sessionLink, session, now, submitted, sessionAlreadyFinished]);
 
   const cameraStreamRef = useRef<MediaStream | null>(null);
 
@@ -320,7 +369,9 @@ export function ActiveExamPageContent() {
     [studentId, effectiveExamId, examSessionId, createProctorLogMutation],
   );
 
-  const examWindowActive = legacyLink || sessionTimeState === "active";
+  const examWindowActive =
+    legacyLink ||
+    (sessionTimeState === "active" && !sessionAlreadyFinished);
 
   useProctor(videoRef, reportFlag, examWindowActive);
   useAudioProctor(reportFlag, audioCanvasRef, examWindowActive);
@@ -349,6 +400,10 @@ export function ActiveExamPageContent() {
 
   if (sessionLink && examId && session && session.examId !== examId) {
     return <SessionExamIdMismatchScreen />;
+  }
+
+  if (sessionLink && session && sessionAlreadyFinished) {
+    return <SessionSubmittedThanksScreen session={session} />;
   }
 
   if (sessionLink && session && sessionTimeState === "not_started") {
@@ -398,11 +453,15 @@ export function ActiveExamPageContent() {
     : examName;
 
   const timeUpAwaitingSubmit =
-    sessionLink && sessionTimeState === "ended" && !submitted;
+    sessionLink &&
+    sessionTimeState === "ended" &&
+    !submitted &&
+    !sessionAlreadyFinished;
 
   const inputsDisabled =
     !isCameraReady ||
     submitted ||
+    sessionAlreadyFinished ||
     submitMutationLoading ||
     Boolean(sessionLink && sessionTimeState === "ended");
 

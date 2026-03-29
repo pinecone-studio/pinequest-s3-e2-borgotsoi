@@ -93,9 +93,12 @@ export function SessionSubmittedThanksScreen({
 }) {
   return (
     <ActiveExamFullPage>
-      <p className="text-lg font-medium text-green-400">Баярлалаа!</p>
+      <p className="text-lg font-medium text-green-400">
+        Your answer has been submitted.
+      </p>
       <p className="mt-2 max-w-md text-sm text-slate-300">
-        Таны хариу амжилттай хадгалагдсан.
+        Таны хариу амжилттай хадгалагдсан. Та энэ шалгалтын сессд дахин
+        оролцох боломжгүй.
       </p>
       <p className="mt-4 text-xs text-slate-500">
         Дууссан: {new Date(session.endTime).toLocaleString()}

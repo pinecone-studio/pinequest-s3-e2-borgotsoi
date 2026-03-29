@@ -4,6 +4,7 @@ import {
   examSessions,
   questions as questionsTable,
   studentAnswers as studentAnswersTable,
+  studentSessionStatus,
 } from "@/db/schema";
 import { MutationResolvers } from "@/gql/graphql";
 
@@ -40,6 +41,20 @@ export const submitExamAnswers: MutationResolvers["submitExamAnswers"] = async (
       throw new Error("Session does not match this exam");
     }
 
+    const [statusRow] = await db
+      .select({ isFinished: studentSessionStatus.isFinished })
+      .from(studentSessionStatus)
+      .where(
+        and(
+          eq(studentSessionStatus.sessionId, sessionId),
+          eq(studentSessionStatus.studentId, studentId),
+        ),
+      )
+      .limit(1);
+    if (statusRow?.isFinished) {
+      throw new Error("Your answer has already been submitted for this session.");
+    }
+
     await db
       .delete(studentAnswersTable)
       .where(
@@ -68,6 +83,17 @@ export const submitExamAnswers: MutationResolvers["submitExamAnswers"] = async (
   }
 
   if (answerInputs.length === 0) {
+    if (sessionId) {
+      await db
+        .update(studentSessionStatus)
+        .set({ isFinished: true })
+        .where(
+          and(
+            eq(studentSessionStatus.sessionId, sessionId),
+            eq(studentSessionStatus.studentId, studentId),
+          ),
+        );
+    }
     return { success: true, submittedCount: 0 };
   }
 
@@ -80,6 +106,18 @@ export const submitExamAnswers: MutationResolvers["submitExamAnswers"] = async (
       answerIndex: a.answerIndex,
     })),
   );
+
+  if (sessionId) {
+    await db
+      .update(studentSessionStatus)
+      .set({ isFinished: true })
+      .where(
+        and(
+          eq(studentSessionStatus.sessionId, sessionId),
+          eq(studentSessionStatus.studentId, studentId),
+        ),
+      );
+  }
 
   return { success: true, submittedCount: answerInputs.length };
 };
