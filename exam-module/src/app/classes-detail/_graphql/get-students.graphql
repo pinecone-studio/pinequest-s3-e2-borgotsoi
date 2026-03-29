@@ -3,6 +3,7 @@ query GetStudents {
     email
     id
     name
+    phone
     classId
   }
 }

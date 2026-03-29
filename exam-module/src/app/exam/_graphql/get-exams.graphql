@@ -2,6 +2,7 @@ query GetExams {
   exams {
     id
     name
+    creatorId
     createdAt
   }
 }

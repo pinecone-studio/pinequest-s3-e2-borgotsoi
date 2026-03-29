@@ -12,7 +12,7 @@ const epochToISOString = (value: unknown) => {
 
 export const createStudent: MutationResolvers["createStudent"] = async (
   _,
-  { name, classId, email },
+  { name, classId, email, phone },
   context,
 ) => {
   const db = getDb(context.db);
@@ -30,6 +30,7 @@ export const createStudent: MutationResolvers["createStudent"] = async (
       name,
       classId,
       email: email.trim(),
+      phone: phone.trim(),
     })
     .returning();
 
@@ -39,6 +40,7 @@ export const createStudent: MutationResolvers["createStudent"] = async (
     id: newStudent.id,
     name: newStudent.name,
     email: newStudent.email,
+    phone: newStudent.phone,
     classId: newStudent.classId,
     createdAt: epochToISOString(newStudent.createdAt),
     updatedAt: epochToISOString(newStudent.updatedAt),

@@ -3,6 +3,7 @@ export const sessionTypeDefs = `
     id: ID!
     examId: ID!
     classId: ID!
+    creatorId: ID!
     exam: Exam     
     class: Class    
     description: String!
@@ -16,6 +17,7 @@ export const sessionTypeDefs = `
   input CreateExamSessionInput {
     examId: ID!
     classId: ID!
+    creatorId: ID!
     description: String!
     startTime: String!
     endTime: String!

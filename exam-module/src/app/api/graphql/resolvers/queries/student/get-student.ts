@@ -23,6 +23,7 @@ export const getStudents: QueryResolvers["getStudents"] = async (
       id: s.id,
       name: s.name,
       email: s.email,
+      phone: s.phone,
       classId: s.classId,
       createdAt: epochToISOString(s.createdAt),
       updatedAt: epochToISOString(s.updatedAt),

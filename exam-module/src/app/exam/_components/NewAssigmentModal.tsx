@@ -105,11 +105,20 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
         formData.endTime || "23:59",
       );
 
+    const selectedExam = examsData?.exams?.find((e) => e.id === formData.examId);
+    if (!selectedExam?.creatorId) {
+      alert(
+        "Сонгосон шалгалтын үүсгэгч (багш) тодорхойгүй тул хуваарь үүсгэх боломжгүй. Эхлээд материалыг багшийн ID-тай үүсгэнэ үү.",
+      );
+      return;
+    }
+
     try {
       await createExamSession({
         variables: {
           examId: formData.examId,
           classId: formData.classId,
+          creatorId: selectedExam.creatorId,
           description: formData.description,
           startTime: formattedStart,
           endTime: formattedEnd,

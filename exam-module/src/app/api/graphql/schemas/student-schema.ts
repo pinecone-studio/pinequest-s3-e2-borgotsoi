@@ -3,6 +3,7 @@ export const studentTypeDefs = `#graphql
     id: ID!
     name: String!
     email: String!
+    phone: String!
     classId: ID!
     createdAt: String!
     updatedAt: String!
@@ -14,8 +15,8 @@ export const studentTypeDefs = `#graphql
   }
 
   extend type Mutation {
-    createStudent(name: String!, email: String!, classId: ID!): Student!
-    updateStudent(id: ID!, name: String, email: String, classId: ID): Student!
+    createStudent(name: String!, email: String!, phone: String!, classId: ID!): Student!
+    updateStudent(id: ID!, name: String, email: String, phone: String, classId: ID): Student!
     deleteStudent(id: ID!): Boolean!
   }
 `;

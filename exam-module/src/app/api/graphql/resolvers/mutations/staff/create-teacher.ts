@@ -73,6 +73,7 @@ export const createTeacher: MutationResolvers["createTeacher"] = async (
       password,
       role: "teacher",
       subjects: subjectList,
+      classIds: [],
     })
     .returning();
 
@@ -88,6 +89,7 @@ export const createTeacher: MutationResolvers["createTeacher"] = async (
     role:
       created.role === "manager" ? UserRole.Manager : UserRole.Teacher,
     subjects: created.subjects ?? [],
+    classIds: created.classIds ?? [],
     createdAt: epochToISOString(created.createdAt),
     updatedAt: epochToISOString(created.updatedAt),
   };
