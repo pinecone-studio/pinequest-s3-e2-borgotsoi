@@ -34,6 +34,7 @@ export type Class = {
 
 export type CreateExamSessionInput = {
   classId: Scalars['ID']['input'];
+  creatorId: Scalars['ID']['input'];
   description: Scalars['String']['input'];
   endTime: Scalars['String']['input'];
   examId: Scalars['ID']['input'];
@@ -67,6 +68,7 @@ export type ExamSession = {
   class?: Maybe<Class>;
   classId: Scalars['ID']['output'];
   createdAt: Scalars['String']['output'];
+  creatorId: Scalars['ID']['output'];
   description: Scalars['String']['output'];
   endTime: Scalars['String']['output'];
   exam?: Maybe<Exam>;
@@ -158,6 +160,7 @@ export type MutationCreateStudentArgs = {
   classId: Scalars['ID']['input'];
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
 };
 
 
@@ -279,6 +282,7 @@ export type MutationUpdateStudentArgs = {
   email?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -427,6 +431,7 @@ export type Student = {
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
   updatedAt: Scalars['String']['output'];
 };
 
@@ -479,6 +484,7 @@ export type Topic = {
 
 export type User = {
   __typename?: 'User';
+  classIds: Array<Scalars['ID']['output']>;
   createdAt: Scalars['String']['output'];
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -654,6 +660,7 @@ export type ExamSessionResolvers<ContextType = any, ParentType extends Resolvers
   class?: Resolver<Maybe<ResolversTypes['Class']>, ParentType, ContextType>;
   classId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  creatorId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   endTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   exam?: Resolver<Maybe<ResolversTypes['Exam']>, ParentType, ContextType>;
@@ -671,7 +678,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createExamSession?: Resolver<ResolversTypes['ExamSession'], ParentType, ContextType, RequireFields<MutationCreateExamSessionArgs, 'input'>>;
   createProctorLog?: Resolver<ResolversTypes['ProctorLog'], ParentType, ContextType, RequireFields<MutationCreateProctorLogArgs, 'eventType' | 'studentId'>>;
   createQuestion?: Resolver<ResolversTypes['Question'], ParentType, ContextType, RequireFields<MutationCreateQuestionArgs, 'answers' | 'correctIndex' | 'examId' | 'question'>>;
-  createStudent?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<MutationCreateStudentArgs, 'classId' | 'email' | 'name'>>;
+  createStudent?: Resolver<ResolversTypes['Student'], ParentType, ContextType, RequireFields<MutationCreateStudentArgs, 'classId' | 'email' | 'name' | 'phone'>>;
   createSubject?: Resolver<ResolversTypes['Subject'], ParentType, ContextType, RequireFields<MutationCreateSubjectArgs, 'name'>>;
   createTeacher?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateTeacherArgs, 'email' | 'lastName' | 'name'>>;
   createTopic?: Resolver<ResolversTypes['Topic'], ParentType, ContextType, RequireFields<MutationCreateTopicArgs, 'grade' | 'name' | 'subjectId'>>;
@@ -745,6 +752,7 @@ export type StudentResolvers<ContextType = any, ParentType extends ResolversPare
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  phone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
@@ -786,6 +794,7 @@ export type TopicResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+  classIds?: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -869,18 +878,19 @@ export type GetClassesDetailPageQuery = { __typename?: 'Query', getClasses: Arra
 export type GetStudentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetStudentsQuery = { __typename?: 'Query', getStudents: Array<{ __typename?: 'Student', email: string, id: string, name: string, classId: string }> };
+export type GetStudentsQuery = { __typename?: 'Query', getStudents: Array<{ __typename?: 'Student', email: string, id: string, name: string, phone: string, classId: string }> };
 
 export type CreateExamSessionMutationMutationVariables = Exact<{
   description?: InputMaybe<Scalars['String']['input']>;
   classId?: InputMaybe<Scalars['ID']['input']>;
+  creatorId: Scalars['ID']['input'];
   endTime?: InputMaybe<Scalars['String']['input']>;
   examId?: InputMaybe<Scalars['ID']['input']>;
   startTime?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type CreateExamSessionMutationMutation = { __typename?: 'Mutation', createExamSession: { __typename?: 'ExamSession', createdAt: string, updatedAt: string, startTime: string, status?: string | null, id: string, description: string, endTime: string, class?: { __typename?: 'Class', name: string, id: string } | null, exam?: { __typename?: 'Exam', id: string, name: string } | null } };
+export type CreateExamSessionMutationMutation = { __typename?: 'Mutation', createExamSession: { __typename?: 'ExamSession', createdAt: string, updatedAt: string, startTime: string, status?: string | null, id: string, creatorId: string, description: string, endTime: string, class?: { __typename?: 'Class', name: string, id: string } | null, exam?: { __typename?: 'Exam', id: string, name: string } | null } };
 
 export type GetActiveSessionQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -895,7 +905,7 @@ export type GetClassesQuery = { __typename?: 'Query', getClasses: Array<{ __type
 export type GetExamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetExamsQuery = { __typename?: 'Query', exams: Array<{ __typename?: 'Exam', id: string, name: string, createdAt: string }> };
+export type GetExamsQuery = { __typename?: 'Query', exams: Array<{ __typename?: 'Exam', id: string, name: string, creatorId?: string | null, createdAt: string }> };
 
 export type GetProctorLogsQueryVariables = Exact<{
   examId?: InputMaybe<Scalars['ID']['input']>;
@@ -981,16 +991,17 @@ export type CreateClassMutation = { __typename?: 'Mutation', createClass: { __ty
 export type CreateStudentMutationVariables = Exact<{
   name: Scalars['String']['input'];
   email: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
   classId: Scalars['ID']['input'];
 }>;
 
 
-export type CreateStudentMutation = { __typename?: 'Mutation', createStudent: { __typename?: 'Student', id: string, name: string, email: string, classId: string } };
+export type CreateStudentMutation = { __typename?: 'Mutation', createStudent: { __typename?: 'Student', id: string, name: string, email: string, phone: string, classId: string } };
 
 export type MyQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyQueryQuery = { __typename?: 'Query', getStudents: Array<{ __typename?: 'Student', classId: string, email: string, id: string, name: string }> };
+export type MyQueryQuery = { __typename?: 'Query', getStudents: Array<{ __typename?: 'Student', classId: string, email: string, id: string, name: string, phone: string }> };
 
 
 export const CreateProctorLogDocument = gql`
@@ -1260,6 +1271,7 @@ export const GetStudentsDocument = gql`
     email
     id
     name
+    phone
     classId
   }
 }
@@ -1300,15 +1312,16 @@ export type GetStudentsLazyQueryHookResult = ReturnType<typeof useGetStudentsLaz
 export type GetStudentsSuspenseQueryHookResult = ReturnType<typeof useGetStudentsSuspenseQuery>;
 export type GetStudentsQueryResult = Apollo.QueryResult<GetStudentsQuery, GetStudentsQueryVariables>;
 export const CreateExamSessionMutationDocument = gql`
-    mutation CreateExamSessionMutation($description: String = "", $classId: ID = "", $endTime: String = "", $examId: ID = "", $startTime: String = "") {
+    mutation CreateExamSessionMutation($description: String = "", $classId: ID = "", $creatorId: ID!, $endTime: String = "", $examId: ID = "", $startTime: String = "") {
   createExamSession(
-    input: {examId: $examId, classId: $classId, description: $description, startTime: $startTime, endTime: $endTime}
+    input: {examId: $examId, classId: $classId, creatorId: $creatorId, description: $description, startTime: $startTime, endTime: $endTime}
   ) {
     createdAt
     updatedAt
     startTime
     status
     id
+    creatorId
     description
     endTime
     class {
@@ -1339,6 +1352,7 @@ export type CreateExamSessionMutationMutationFn = Apollo.MutationFunction<Create
  *   variables: {
  *      description: // value for 'description'
  *      classId: // value for 'classId'
+ *      creatorId: // value for 'creatorId'
  *      endTime: // value for 'endTime'
  *      examId: // value for 'examId'
  *      startTime: // value for 'startTime'
@@ -1456,6 +1470,7 @@ export const GetExamsDocument = gql`
   exams {
     id
     name
+    creatorId
     createdAt
   }
 }
@@ -1918,11 +1933,12 @@ export type CreateClassMutationHookResult = ReturnType<typeof useCreateClassMuta
 export type CreateClassMutationResult = Apollo.MutationResult<CreateClassMutation>;
 export type CreateClassMutationOptions = Apollo.BaseMutationOptions<CreateClassMutation, CreateClassMutationVariables>;
 export const CreateStudentDocument = gql`
-    mutation CreateStudent($name: String!, $email: String!, $classId: ID!) {
-  createStudent(name: $name, email: $email, classId: $classId) {
+    mutation CreateStudent($name: String!, $email: String!, $phone: String!, $classId: ID!) {
+  createStudent(name: $name, email: $email, phone: $phone, classId: $classId) {
     id
     name
     email
+    phone
     classId
   }
 }
@@ -1944,6 +1960,7 @@ export type CreateStudentMutationFn = Apollo.MutationFunction<CreateStudentMutat
  *   variables: {
  *      name: // value for 'name'
  *      email: // value for 'email'
+ *      phone: // value for 'phone'
  *      classId: // value for 'classId'
  *   },
  * });
@@ -1962,6 +1979,7 @@ export const MyQueryDocument = gql`
     email
     id
     name
+    phone
   }
 }
     `;

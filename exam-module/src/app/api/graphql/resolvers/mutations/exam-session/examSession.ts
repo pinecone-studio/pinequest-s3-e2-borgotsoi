@@ -5,6 +5,7 @@ import {
   examSessions as examSessionsTable,
   studentSessionStatus as studentSessionStatusTable,
   students as studentsTable,
+  users as usersTable,
 } from "@/db/schema";
 import { sendExamInviteEmails } from "@/lib/send-exam-invite-emails";
 import { MutationResolvers } from "@/gql/graphql";
@@ -35,11 +36,19 @@ export const createExamSession: MutationResolvers["createExamSession"] = async (
 ) => {
   const db = getDb(context.db);
 
+  const [creator] = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.id, input.creatorId))
+    .limit(1);
+  if (!creator) throw new Error("Creator user not found");
+
   const [created] = await db
     .insert(examSessionsTable)
     .values({
       examId: input.examId,
       classId: input.classId,
+      creatorId: input.creatorId,
       description: input.description,
       startTime: new Date(input.startTime).getTime(),
       endTime: new Date(input.endTime).getTime(),
@@ -99,6 +108,7 @@ export const createExamSession: MutationResolvers["createExamSession"] = async (
     id: created.id,
     examId: created.examId,
     classId: created.classId,
+    creatorId: created.creatorId,
     description: created.description,
     startTime: epochToISOString(created.startTime),
     endTime: epochToISOString(created.endTime),

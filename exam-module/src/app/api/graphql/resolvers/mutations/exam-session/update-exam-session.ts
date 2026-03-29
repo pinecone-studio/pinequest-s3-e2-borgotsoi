@@ -49,6 +49,7 @@ export const updateExamSession: MutationResolvers["updateExamSession"] = async (
     id: row.id,
     examId: row.examId,
     classId: row.classId,
+    creatorId: row.creatorId,
     description: row.description,
     startTime: epochToISOString(row.startTime),
     endTime: epochToISOString(row.endTime),

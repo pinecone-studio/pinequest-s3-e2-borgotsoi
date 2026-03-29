@@ -26,6 +26,7 @@ export const staffUsers: QueryResolvers["staffUsers"] = async (
     role:
       u.role === "manager" ? UserRole.Manager : UserRole.Teacher,
     subjects: u.subjects ?? [],
+    classIds: u.classIds ?? [],
     createdAt: epochToISOString(u.createdAt),
     updatedAt: epochToISOString(u.updatedAt),
   }));

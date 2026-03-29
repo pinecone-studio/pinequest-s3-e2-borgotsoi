@@ -12,7 +12,7 @@ const epochToISOString = (value: unknown) => {
 
 export const updateStudent: MutationResolvers["updateStudent"] = async (
   _,
-  { id, name, email, classId },
+  { id, name, email, phone, classId },
   context,
 ) => {
   const db = getDb(context.db);
@@ -20,11 +20,13 @@ export const updateStudent: MutationResolvers["updateStudent"] = async (
   const patch: {
     name?: string;
     email?: string;
+    phone?: string;
     classId?: string;
   } = {};
 
   if (name !== undefined && name !== null) patch.name = name;
   if (email !== undefined && email !== null) patch.email = email;
+  if (phone !== undefined && phone !== null) patch.phone = phone.trim();
   if (classId !== undefined) {
     if (classId === null) throw new Error("classId cannot be null");
     const [klass] = await db
@@ -53,6 +55,7 @@ export const updateStudent: MutationResolvers["updateStudent"] = async (
     id: row.id,
     name: row.name,
     email: row.email,
+    phone: row.phone,
     classId: row.classId,
     createdAt: epochToISOString(row.createdAt),
     updatedAt: epochToISOString(row.updatedAt),

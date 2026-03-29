@@ -4,5 +4,6 @@ query MyQuery {
     email
     id
     name
+    phone
   }
 }

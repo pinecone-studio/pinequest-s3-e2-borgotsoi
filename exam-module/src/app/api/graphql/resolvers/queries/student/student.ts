@@ -29,6 +29,7 @@ export const student: QueryResolvers["student"] = async (
     id: row.id,
     name: row.name,
     email: row.email,
+    phone: row.phone,
     classId: row.classId,
     createdAt: epochToISOString(row.createdAt),
     updatedAt: epochToISOString(row.updatedAt),

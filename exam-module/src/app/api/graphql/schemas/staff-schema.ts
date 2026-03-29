@@ -13,6 +13,7 @@ export const staffTypeDefs = /* GraphQL */ `
     password: String
     role: UserRole!
     subjects: [String!]!
+    classIds: [ID!]!
     createdAt: String!
     updatedAt: String!
   }
