@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useState, useMemo, useCallback } from "react";
 import TabButton from "./_components/TabButton";
 import AssignmentCard from "./_components/Assignment.Card";
@@ -77,9 +76,19 @@ export default function ShalgaltPage() {
   const getEventLabel = (eventType: string) => {
     const type = eventType.toLowerCase();
 
+    if (type.includes("tab_hidden")) return "Цонхыг далд болгосон";
+    if (type.includes("window_blur")) return "Chrome оос гарсан";
+    if (type.includes("window_focus")) return "Таб руу буцаж орсон";
+    if (type.includes("clipboard_copy")) return "Copy хийсэн";
+    if (type.includes("clipboard_paste")) return "Paste хийсэн";
+    if (type.includes("clipboard_cut")) return "Cut хийсэн";
+    if (type.includes("context_menu_blocked"))
+      return "Баруун товч цэс блоклогдсон";
+    if (type.includes("user_idle")) return "Afk байсан";
     if (type.includes("human_speech")) return "Бусадтай ярьсан";
     if (type.includes("tab_change")) return "Цонх солих гэж оролдсон";
     if (type.includes("no_face_detected")) return "Сурагч харагдахгүй байна";
+
     if (
       type.includes("camera_off") ||
       type.includes("camera_disabled") ||

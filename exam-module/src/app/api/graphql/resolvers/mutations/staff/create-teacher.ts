@@ -40,10 +40,14 @@ async function allocateUsername(db: ReturnType<typeof getDb>): Promise<string> {
 
 export const createTeacher: MutationResolvers["createTeacher"] = async (
   _,
-  { name, lastName, email, subjects },
+  { name, lastName, email, subjects, role: roleInput },
   context,
 ) => {
   const db = getDb(context.db);
+
+  // Determine the role — default to "teacher" if not provided
+  const role: "teacher" | "manager" =
+    roleInput === UserRole.Manager ? "manager" : "teacher";
 
   // Check for duplicate email before inserting
   const existingEmail = await db
@@ -72,7 +76,7 @@ export const createTeacher: MutationResolvers["createTeacher"] = async (
       email: email.trim(),
       username,
       password,
-      role: "teacher",
+      role,
       subjects: subjectList,
       classIds: [],
     })

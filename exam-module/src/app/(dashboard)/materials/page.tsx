@@ -89,6 +89,26 @@ export default function MaterialsPage() {
         </div>
       </div>
 
+      {error && (
+        <p className="text-sm text-red-600 mb-4">Алдаа: {error.message}</p>
+      )}
+
+      {loading && !data ? (
+        <p className="text-sm text-gray-500 mb-4">Уншиж байна…</p>
+      ) : null}
+
+      <div className="flex flex-wrap gap-10  mt-10">
+        {activeTab === "mine" ? (
+          <>
+            <AddCard onClick={() => router.push("/materials/create")} />
+            {materials.map((m) => (
+              <MaterialCard 
+                key={m.id}
+                material={m}
+                onClick={() => router.push(`/materials/${m.id}`)}
+              />
+            ))}
+          </>
       <div className="mt-10">
         {selectedExamId ? (
           <div>

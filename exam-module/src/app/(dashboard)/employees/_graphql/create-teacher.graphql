@@ -3,12 +3,14 @@ mutation CreateTeacher(
   $lastName: String!
   $email: String!
   $subjects: [String]
+  $role: UserRole
 ) {
   createTeacher(
     name: $name
     lastName: $lastName
     email: $email
     subjects: $subjects
+    role: $role
   ) {
     id
     name

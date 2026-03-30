@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useLiveKitExamPublisher } from "@/hooks/useLiveKitExamPublisher";
 import { useProctor } from "@/providers/ProctorProvider";
 import { useAudioProctor } from "@/providers/SpeechRecognizeProvider";
@@ -12,13 +11,7 @@ import {
   useSubmitExamAnswersMutation,
 } from "@/gql/graphql";
 import { useSearchParams } from "next/navigation";
-import {
-  useRef,
-  useCallback,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+import { useRef, useCallback, useEffect, useState, useMemo } from "react";
 import { ProctoringDashboard } from "./ProctoringDashboard";
 import { ActiveExamBanners } from "./ActiveExamBanners";
 import { ActiveExamHeader } from "./ActiveExamHeader";
@@ -37,6 +30,12 @@ import {
 } from "./ActiveExamGateScreens";
 import { variationStorageKey } from "./active-exam-utils";
 import { normalizeVariationLabel } from "@/app/(dashboard)/materials/_components/variation";
+import { useExamIntegrity, syncOfflineAnswers } from "./useExamIntegrity";
+
+async function getDbForOffline() {
+  const { db } = await import("@/lib/db");
+  return db;
+}
 
 export function ActiveExamPageContent() {
   const searchParams = useSearchParams();
@@ -55,6 +54,7 @@ export function ActiveExamPageContent() {
   } = useGetExamSessionForActiveExamQuery({
     variables: { id: examSessionId, studentId },
     skip: !examSessionId || !studentId,
+    fetchPolicy: "cache-first",
   });
 
   const sessionFetchIncomplete =
@@ -181,6 +181,7 @@ export function ActiveExamPageContent() {
   } = useGetActiveExamTakingQuery({
     variables: { examId: effectiveExamId },
     skip: skipExamTakingQuery || !effectiveExamId,
+    fetchPolicy: "cache-first",
   });
 
   const allTakerQuestions = useMemo(
@@ -228,9 +229,7 @@ export function ActiveExamPageContent() {
   const displayQuestions = useMemo(() => {
     if (chosenVariation === null || chosenVariation === "") return [];
     return allTakerQuestions
-      .filter(
-        (q) => normalizeVariationLabel(q.variation) === chosenVariation,
-      )
+      .filter((q) => normalizeVariationLabel(q.variation) === chosenVariation)
       .sort((a, b) => a.id.localeCompare(b.id));
   }, [allTakerQuestions, chosenVariation]);
 
@@ -239,11 +238,7 @@ export function ActiveExamPageContent() {
   }, [displayQuestions]);
 
   const performSubmit = useCallback(async () => {
-    if (
-      submittedRef.current ||
-      submittingRef.current ||
-      sessionAlreadyFinished
-    )
+    if (submittedRef.current || submittingRef.current || sessionAlreadyFinished)
       return;
     const exam = effectiveExamId;
     if (!exam || !studentId) return;
@@ -260,6 +255,7 @@ export function ActiveExamPageContent() {
           (x): x is { questionId: string; answerIndex: number } =>
             typeof x.answerIndex === "number" && x.answerIndex >= 0,
         );
+      // Try to submit to server
       await submitExamAnswersMutation({
         variables: {
           studentId,
@@ -270,12 +266,85 @@ export function ActiveExamPageContent() {
       });
       setSubmitted(true);
     } catch (e) {
-      console.error(e);
-      setSubmitError(
-        e instanceof Error
-          ? e.message
-          : "Илгээхэд алдаа гарлаа. Дахин оролдоно уу.",
-      );
+      // If offline or network error, save to Dexie and mark as submitted locally
+      let savedOffline = false;
+      try {
+        const qs = displayQuestionsRef.current;
+        const answerRows = qs
+          .map((q) => {
+            const answerIndex = choicesRef.current[q.id];
+            if (typeof answerIndex !== "number" || answerIndex < 0) return null;
+            return {
+              studentName: studentId,
+              questionId: q.id,
+              answer: String(answerIndex),
+              examId: exam,
+              sessionId: examSessionId || undefined,
+              synced: false,
+            };
+          })
+          .filter(
+            (
+              x,
+            ): x is {
+              studentName: string;
+              questionId: string;
+              answer: string;
+              examId: string;
+              sessionId: string | undefined;
+              synced: boolean;
+            } => x !== null,
+          );
+        if (answerRows.length > 0) {
+          const db = await getDbForOffline();
+          await db.answers.bulkAdd(answerRows);
+          console.log(
+            `[offline] Saved ${answerRows.length} answers to IndexedDB`,
+          );
+          savedOffline = true;
+        }
+      } catch (dexieErr) {
+        console.error("Failed to save answers offline:", dexieErr);
+      }
+
+      if (savedOffline) {
+        // Mark as submitted locally, then retry sync until it succeeds
+        setSubmitted(true);
+        // Retry with backoff: 300ms, 1.5s, 4s, 10s, 20s
+        const retryDelays = [300, 1500, 4000, 10000, 20000];
+        const trySyncWithRetry = async () => {
+          for (const delay of retryDelays) {
+            await new Promise((r) => setTimeout(r, delay));
+            try {
+              await syncOfflineAnswers();
+              // Check if all are now synced
+              const { db: dexieDb } = await import("@/lib/db");
+              const remaining = await dexieDb.answers
+                .filter((a) => !a.synced)
+                .count();
+              if (remaining === 0) {
+                console.log("[submit] All answers synced ✅");
+                return;
+              }
+              console.log(
+                `[submit] ${remaining} answers still unsynced, retrying...`,
+              );
+            } catch {
+              // network still down, keep retrying
+            }
+          }
+          console.warn(
+            "[submit] Sync retries exhausted — will sync on next online event",
+          );
+        };
+        void trySyncWithRetry();
+      } else {
+        setSubmitError(
+          e instanceof Error
+            ? e.message + " — Дахин оролдоно уу."
+            : "Илгээхэд алдаа гарлаа. Дахин оролдоно уу.",
+        );
+      }
     } finally {
       submittingRef.current = false;
     }
@@ -371,8 +440,17 @@ export function ActiveExamPageContent() {
   );
 
   const examWindowActive =
-    legacyLink ||
-    (sessionTimeState === "active" && !sessionAlreadyFinished);
+    legacyLink || (sessionTimeState === "active" && !sessionAlreadyFinished);
+
+  // ── Exam integrity: offline detection, tab-switch, copy-paste block, idle, answer speed ──
+  const integrityActive = examWindowActive && !submitted;
+  const { trackAnswerSelection } = useExamIntegrity({
+    active: integrityActive,
+    reportFlag,
+    studentId,
+    examId: effectiveExamId || undefined,
+    sessionId: examSessionId || undefined,
+  });
 
   useProctor(videoRef, reportFlag, examWindowActive);
   useAudioProctor(reportFlag, audioCanvasRef, examWindowActive);
@@ -407,6 +485,10 @@ export function ActiveExamPageContent() {
     return <SessionSubmittedThanksScreen session={session} />;
   }
 
+  if (sessionLink && session && submitted) {
+    return <SessionSubmittedThanksScreen session={session} />;
+  }
+
   if (sessionLink && session && sessionTimeState === "not_started") {
     return <SessionNotStartedScreen session={session} now={now} />;
   }
@@ -420,10 +502,6 @@ export function ActiveExamPageContent() {
     return <SessionEndedLateScreen session={session} />;
   }
 
-  if (sessionLink && session && sessionTimeState === "ended" && submitted) {
-    return <SessionSubmittedThanksScreen session={session} />;
-  }
-
   if (shouldLoadExamContent && examLoading) {
     return <ExamMaterialLoadingScreen />;
   }
@@ -431,9 +509,7 @@ export function ActiveExamPageContent() {
   if (shouldLoadExamContent && (examError || !examData?.exam)) {
     return (
       <ExamMaterialErrorScreen
-        message={
-          examError?.message ?? "Шалгалт устгагдсан эсвэл буруу байна."
-        }
+        message={examError?.message ?? "Шалгалт устгагдсан эсвэл буруу байна."}
       />
     );
   }
@@ -489,9 +565,10 @@ export function ActiveExamPageContent() {
         <ActiveExamQuestionsColumn
           displayQuestions={displayQuestions}
           choices={choices}
-          onChoiceChange={(questionId, answerIndex) =>
-            setChoices((prev) => ({ ...prev, [questionId]: answerIndex }))
-          }
+          onChoiceChange={(questionId, answerIndex) => {
+            setChoices((prev) => ({ ...prev, [questionId]: answerIndex }));
+            trackAnswerSelection(questionId);
+          }}
           inputsDisabled={inputsDisabled}
           submitted={submitted}
           submitMutationLoading={submitMutationLoading}

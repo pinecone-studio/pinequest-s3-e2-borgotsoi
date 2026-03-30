@@ -10,6 +10,7 @@ import {
   useRemoveTeacherFromClassMutation,
   useDeleteTeacherMutation,
   GetStaffUsersDocument,
+  UserRole,
 } from "@/gql/graphql";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,12 +29,13 @@ import {
   Search,
   Plus,
   Users,
-  Mail,
   GraduationCap,
   Loader2,
   BookOpen,
   X,
   Trash2,
+  Shield,
+  UserCheck,
 } from "lucide-react";
 
 // ── Subject / specialty helpers ──────────────────────────────────────────────
@@ -119,6 +121,7 @@ export default function EmployeesPage() {
   const [formName, setFormName] = useState("");
   const [formLastName, setFormLastName] = useState("");
   const [formEmail, setFormEmail] = useState("");
+  const [formRole, setFormRole] = useState<"teacher" | "manager">("teacher");
   const [formSubject, setFormSubject] = useState("");
   const [formClassIds, setFormClassIds] = useState<string[]>([]);
 
@@ -172,6 +175,7 @@ export default function EmployeesPage() {
     setFormName("");
     setFormLastName("");
     setFormEmail("");
+    setFormRole("teacher");
     setFormSubject("");
     setFormClassIds([]);
   };
@@ -184,6 +188,7 @@ export default function EmployeesPage() {
         lastName: formLastName.trim(),
         email: formEmail.trim(),
         subjects: formSubject ? [formSubject] : [],
+        role: formRole === "manager" ? UserRole.Manager : UserRole.Teacher,
       },
     });
     // Assign selected classes to the new teacher
@@ -250,14 +255,14 @@ export default function EmployeesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Багш нар</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Ажилтнууд</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Бүртгэлтэй багш нарын жагсаалт
+            Бүртгэлтэй багш болон менежерүүдийн жагсаалт
           </p>
         </div>
         <Button className="gap-2 w-fit" onClick={() => setOpen(true)}>
           <Plus className="size-4" />
-          Багш нэмэх
+          Ажилтан нэмэх
         </Button>
       </div>
 
@@ -265,11 +270,66 @@ export default function EmployeesPage() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="sm:max-w-md">
           <SheetHeader>
-            <SheetTitle>Шинэ багш нэмэх</SheetTitle>
-            <SheetDescription>Багшийн мэдээллийг оруулна уу.</SheetDescription>
+            <SheetTitle>Шинэ ажилтан нэмэх</SheetTitle>
+            <SheetDescription>Ажилтны мэдээллийг оруулна уу.</SheetDescription>
           </SheetHeader>
 
           <div className="flex flex-col gap-5 px-4 py-2 flex-1 overflow-y-auto">
+            {/* Role selector */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">
+                Эрхийн түвшин <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormRole("teacher")}
+                  className={`flex-1 flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                    formRole === "teacher"
+                      ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500/20"
+                      : "border-gray-200 bg-white hover:border-gray-300"
+                  }`}
+                >
+                  <div className={`flex items-center justify-center size-9 rounded-lg ${
+                    formRole === "teacher" ? "bg-blue-100" : "bg-gray-100"
+                  }`}>
+                    <UserCheck className={`size-4 ${
+                      formRole === "teacher" ? "text-blue-600" : "text-gray-400"
+                    }`} />
+                  </div>
+                  <div className="text-left">
+                    <p className={`text-sm font-semibold ${
+                      formRole === "teacher" ? "text-blue-700" : "text-gray-700"
+                    }`}>Багш</p>
+                    <p className="text-xs text-gray-400">Хичээл, шалгалт удирдах</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormRole("manager")}
+                  className={`flex-1 flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                    formRole === "manager"
+                      ? "border-violet-500 bg-violet-50 ring-2 ring-violet-500/20"
+                      : "border-gray-200 bg-white hover:border-gray-300"
+                  }`}
+                >
+                  <div className={`flex items-center justify-center size-9 rounded-lg ${
+                    formRole === "manager" ? "bg-violet-100" : "bg-gray-100"
+                  }`}>
+                    <Shield className={`size-4 ${
+                      formRole === "manager" ? "text-violet-600" : "text-gray-400"
+                    }`} />
+                  </div>
+                  <div className="text-left">
+                    <p className={`text-sm font-semibold ${
+                      formRole === "manager" ? "text-violet-700" : "text-gray-700"
+                    }`}>Менежер</p>
+                    <p className="text-xs text-gray-400">Бүх эрхтэй удирдлага</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             {/* Name */}
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-gray-700">
@@ -433,6 +493,19 @@ export default function EmployeesPage() {
                   <p className="text-sm text-gray-500">
                     {selectedTeacher.email}
                   </p>
+                  <div className="mt-1">
+                    {selectedTeacher.role === UserRole.Manager ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+                        <Shield className="size-3" />
+                        Менежер
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                        <UserCheck className="size-3" />
+                        Багш
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -557,7 +630,7 @@ export default function EmployeesPage() {
       </Sheet>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border p-5 flex items-center gap-4 shadow-sm">
           <div className="flex items-center justify-center size-11 rounded-lg bg-violet-100">
             <Users className="size-5 text-violet-600" />
@@ -566,31 +639,40 @@ export default function EmployeesPage() {
             <p className="text-2xl font-bold text-gray-900">
               {loading ? "—" : teachers.length}
             </p>
-            <p className="text-xs text-gray-500">Нийт багш</p>
+            <p className="text-xs text-gray-500">Нийт ажилтан</p>
           </div>
         </div>
         <div className="bg-white rounded-xl border p-5 flex items-center gap-4 shadow-sm">
           <div className="flex items-center justify-center size-11 rounded-lg bg-blue-100">
-            <GraduationCap className="size-5 text-blue-600" />
+            <UserCheck className="size-5 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-gray-900">
+              {loading ? "—" : (data?.staffUsers ?? []).filter((t) => t.role === UserRole.Teacher).length}
+            </p>
+            <p className="text-xs text-gray-500">Багш</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border p-5 flex items-center gap-4 shadow-sm">
+          <div className="flex items-center justify-center size-11 rounded-lg bg-purple-100">
+            <Shield className="size-5 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-gray-900">
+              {loading ? "—" : (data?.staffUsers ?? []).filter((t) => t.role === UserRole.Manager).length}
+            </p>
+            <p className="text-xs text-gray-500">Менежер</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border p-5 flex items-center gap-4 shadow-sm">
+          <div className="flex items-center justify-center size-11 rounded-lg bg-emerald-100">
+            <GraduationCap className="size-5 text-emerald-600" />
           </div>
           <div>
             <p className="text-2xl font-bold text-gray-900">
               {loading ? "—" : classMap.size}
             </p>
             <p className="text-xs text-gray-500">Нийт анги</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border p-5 flex items-center gap-4 shadow-sm">
-          <div className="flex items-center justify-center size-11 rounded-lg bg-emerald-100">
-            <Mail className="size-5 text-emerald-600" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-gray-900">
-              {loading
-                ? "—"
-                : (data?.staffUsers ?? []).filter((t) => t.email).length}
-            </p>
-            <p className="text-xs text-gray-500">Имэйлтэй</p>
           </div>
         </div>
       </div>
@@ -641,8 +723,9 @@ export default function EmployeesPage() {
             <table className="w-full">
               <thead>
                 <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <th className="px-4 py-3">Багш</th>
+                  <th className="px-4 py-3">Ажилтан</th>
                   <th className="px-4 py-3 hidden sm:table-cell">Имэйл</th>
+                  <th className="px-4 py-3 hidden md:table-cell">Эрх</th>
                   <th className="px-4 py-3 hidden md:table-cell">Анги</th>
                   <th className="px-4 py-3 hidden lg:table-cell">Мэргэжил</th>
                   <th className="px-4 py-3 text-right">Үйлдэл</th>
@@ -690,6 +773,19 @@ export default function EmployeesPage() {
                         <p className="text-sm text-gray-600">{teacher.email}</p>
                       </td>
                       <td className="px-4 py-3.5 hidden md:table-cell">
+                        {teacher.role === UserRole.Manager ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+                            <Shield className="size-3" />
+                            Менежер
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            <UserCheck className="size-3" />
+                            Багш
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5 hidden md:table-cell">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
                           {classNames || "—"}
                         </span>
@@ -724,12 +820,12 @@ export default function EmployeesPage() {
                   <Users className="size-7 text-slate-400" />
                 </div>
                 <p className="text-sm font-medium text-gray-900">
-                  Багш олдсонгүй
+                  Ажилтан олдсонгүй
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   {search
                     ? "Хайлтын үр дүн олдсонгүй. Өөр түлхүүр үгээр хайна уу."
-                    : "Одоогоор бүртгэлтэй багш байхгүй байна."}
+                    : "Одоогоор бүртгэлтэй ажилтан байхгүй байна."}
                 </p>
               </div>
             )}

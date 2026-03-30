@@ -27,7 +27,9 @@ export const submitExamAnswers: MutationResolvers["submitExamAnswers"] = async (
     }
     const n = q.answers.length;
     if (row.answerIndex < 0 || row.answerIndex >= n) {
-      throw new Error(`answerIndex out of range for question ${row.questionId}`);
+      throw new Error(
+        `answerIndex out of range for question ${row.questionId}`,
+      );
     }
   }
 
@@ -52,7 +54,8 @@ export const submitExamAnswers: MutationResolvers["submitExamAnswers"] = async (
       )
       .limit(1);
     if (statusRow?.isFinished) {
-      throw new Error("Your answer has already been submitted for this session.");
+      // Already submitted — treat as idempotent success so offline sync can mark records as synced
+      return { success: true, submittedCount: 0 };
     }
 
     await db

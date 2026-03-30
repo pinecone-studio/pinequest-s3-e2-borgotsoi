@@ -1,17 +1,19 @@
-const CACHE_NAME = "mini-test-cache-v14";
-const MINI_TEST_PATH = "/mini-test";
+const CACHE_NAME = "mini-test-cache-v15";
+const CACHED_PATHS = ["/mini-test", "/active-exam"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      try {
-        const res = await fetch(MINI_TEST_PATH, { cache: "no-store" });
-        if (res.ok) {
-          await cache.put(MINI_TEST_PATH, res.clone());
+      for (const path of CACHED_PATHS) {
+        try {
+          const res = await fetch(path, { cache: "no-store" });
+          if (res.ok) {
+            await cache.put(path, res.clone());
+          }
+        } catch (e) {
+          console.warn("precache failed:", path, e);
         }
-      } catch (e) {
-        console.warn("precache failed:", MINI_TEST_PATH, e);
       }
     })(),
   );
@@ -39,17 +41,18 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Only intercept requests related to /mini-test
-  const isMiniTestNav =
-    request.mode === "navigate" && url.pathname.startsWith(MINI_TEST_PATH);
-  const isMiniTestAsset =
+  // Check if this request is for one of our cached app paths
+  const matchedPath = CACHED_PATHS.find((p) => url.pathname.startsWith(p));
+
+  const isCachedNav = request.mode === "navigate" && !!matchedPath;
+  const isCachedAsset =
     url.pathname.startsWith("/_next/static/") &&
-    request.headers.get("referer")?.includes(MINI_TEST_PATH);
+    CACHED_PATHS.some((p) => request.headers.get("referer")?.includes(p));
 
-  if (!isMiniTestNav && !isMiniTestAsset) return;
+  if (!isCachedNav && !isCachedAsset) return;
 
-  // Network-first for mini-test navigation
-  if (isMiniTestNav) {
+  // Network-first for navigation (page loads)
+  if (isCachedNav) {
     event.respondWith(
       (async () => {
         try {
@@ -58,13 +61,15 @@ self.addEventListener("fetch", (event) => {
           await cache.put(request, networkRes.clone());
           return networkRes;
         } catch {
+          // Offline — serve from cache
           const cached = await caches.match(request);
           if (cached) return cached;
 
-          const fallback = await caches.match(MINI_TEST_PATH);
+          // Try the base path as fallback (e.g. /active-exam for /active-exam?studentId=...)
+          const fallback = await caches.match(matchedPath);
           if (fallback) return fallback;
 
-          return new Response("Offline – mini-test not cached yet", {
+          return new Response("Offline – page not cached yet", {
             status: 503,
             headers: { "Content-Type": "text/plain" },
           });
@@ -74,8 +79,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache-first for mini-test static assets (JS/CSS chunks)
-  if (isMiniTestAsset) {
+  // Cache-first for static assets (JS/CSS chunks)
+  if (isCachedAsset) {
     event.respondWith(
       (async () => {
         const cached = await caches.match(request);
