@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGetClassesQuery, useGetExamssQueryQuery } from "@/gql/graphql";
-import ExamVariationsHubPage from "./[examId]/page";
+import ExamVariationsHub from "./_components/ExamVariationsHub";
 import {
   formatExamCardDate,
   gradientForExamId,
@@ -21,7 +21,7 @@ export default function MaterialsPage() {
     fetchPolicy: "cache-and-network",
   });
 
-  const { data: classData } = useGetClassesQuery();
+  useGetClassesQuery();
   const materials: Material[] = useMemo(() => {
     const exams = data?.exams ?? [];
     return exams.map((exam) => ({
@@ -106,7 +106,7 @@ export default function MaterialsPage() {
             >
               ← Буцах
             </button>
-            <ExamVariationsHubPage examId={selectedExamId} />
+            <ExamVariationsHub examId={selectedExamId} />
           </div>
         ) : (
           <div className="flex flex-wrap gap-10">

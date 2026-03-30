@@ -26,12 +26,10 @@ export default function ShalgaltPage() {
   >(null);
 
   const { data, loading, error } = useGetActiveSessionQuery();
-  const { data: proctorData, loading: proctorLoading } = useGetProctorLogsQuery(
-    {
-      fetchPolicy: "cache-and-network",
-      pollInterval: 5000,
-    },
-  );
+  const { data: proctorData } = useGetProctorLogsQuery({
+    fetchPolicy: "cache-and-network",
+    pollInterval: 5000,
+  });
   const sessions = useMemo(
     () => data?.getActiveSessions ?? [],
     [data?.getActiveSessions],
@@ -210,7 +208,7 @@ export default function ShalgaltPage() {
 
   useEffect(() => {
     if (activeTab !== 2) return;
-    setProctorNowMs(Date.now());
+    queueMicrotask(() => setProctorNowMs(Date.now()));
     const id = window.setInterval(() => setProctorNowMs(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, [activeTab]);
@@ -226,7 +224,7 @@ export default function ShalgaltPage() {
       return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     }
     return `${m}:${String(s).padStart(2, "0")}`;
-  }, [viewerSession?.endTime, proctorNowMs]);
+  }, [viewerSession, proctorNowMs]);
 
   if (loading)
     return <div className="p-8 text-center text-gray-500">Уншиж байна...</div>;

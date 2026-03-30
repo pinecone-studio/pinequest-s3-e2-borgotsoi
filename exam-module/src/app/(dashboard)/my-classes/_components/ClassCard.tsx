@@ -24,7 +24,7 @@ export const ClassCard = ({ name, id, index, studentCount }: ClassCardProps) => 
   const [menuOpen, setMenuOpen]       = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const { refetch } = useGetClassesQuery();
+  useGetClassesQuery();
   // const [deleteClass, { loading }] =  useDeleteClassMutation({
   //   onCompleted: () => refetch(),
   // });

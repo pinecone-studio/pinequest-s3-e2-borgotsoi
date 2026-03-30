@@ -55,7 +55,7 @@ CREATE TABLE `questions` (
 	`correct_index` integer NOT NULL,
 	`variation` text NOT NULL,
 	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
-	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
+	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL, `attachment_key` text,
 	FOREIGN KEY (`exam_id`) REFERENCES `exams`(`id`) ON UPDATE no action ON DELETE cascade
 );
 CREATE TABLE `student_answers` (
@@ -110,6 +110,10 @@ CREATE TABLE `users` (
 	`created_at` integer DEFAULT (unixepoch() * 1000) NOT NULL,
 	`updated_at` integer DEFAULT (unixepoch() * 1000) NOT NULL
 , `class_ids` text DEFAULT '[]');
+INSERT INTO "users" ("id","name","last_name","email","username","password","role","subjects","created_at","updated_at","class_ids") VALUES('4d138b16-4ac9-48b2-bcba-f200a871e056','Ariuntuguldur','Khurelbaatar','ariuntuguldur3@gmail.com','akhurelbaatar604','zWm8Sk4a','manager','[]',1774792119000,1774792119000,'[]');
+INSERT INTO "users" ("id","name","last_name","email","username","password","role","subjects","created_at","updated_at","class_ids") VALUES('cdf7bd9b-969a-4434-859f-46e6f607a57e','Bulgaa','Buuk','bulgantuyadorjpalam@gmail.com','pinequest262279781','9781','manager','[]',1774793084000,1774793084000,'[]');
+INSERT INTO "users" ("id","name","last_name","email","username","password","role","subjects","created_at","updated_at","class_ids") VALUES('b7aaeac6-5404-4cda-a06a-d1b317cd54fb','Temuujin','Dambadarjaa','ttemuujin.124@gmail.com','pinequest262275862','5862','teacher','["pe"]',1774793552000,1774793552000,'[]');
+INSERT INTO "users" ("id","name","last_name","email","username","password","role","subjects","created_at","updated_at","class_ids") VALUES('864a45d2-3735-4b5d-9be3-6f5eab5e3ce5','urantogos👩‍💻','_uka','ourantogos65@gmail.com','uka123','1880','manager','[]',1774797733000,1774797733000,'[]');
 CREATE TABLE IF NOT EXISTS "students" (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
