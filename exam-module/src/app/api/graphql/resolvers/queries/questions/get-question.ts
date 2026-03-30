@@ -32,6 +32,7 @@ export const question: QueryResolvers["question"] = async (
     answers: row.answers,
     correctIndex: row.correctIndex,
     variation: row.variation,
+    attachmentKey: row.attachmentKey ?? null,
     createdAt: epochToISOString(row.createdAt),
     updatedAt: epochToISOString(row.updatedAt),
   };

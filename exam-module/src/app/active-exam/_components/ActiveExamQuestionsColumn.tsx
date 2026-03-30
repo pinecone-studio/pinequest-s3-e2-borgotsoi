@@ -3,6 +3,7 @@ type DisplayQuestion = {
   question: string;
   answers: Array<string>;
   variation: string;
+  attachmentUrl?: string | null;
 };
 
 type ActiveExamQuestionsColumnProps = {
@@ -48,6 +49,18 @@ export function ActiveExamQuestionsColumn({
             <p className="text-lg leading-relaxed mb-6 whitespace-pre-wrap text-slate-100">
               {q.question}
             </p>
+            {q.attachmentUrl ? (
+              <p className="mb-6">
+                <a
+                  href={q.attachmentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-blue-400 hover:text-blue-300 underline underline-offset-2"
+                >
+                  PDF материал нээх
+                </a>
+              </p>
+            ) : null}
             <ul className="space-y-3">
               {q.answers.map((label, idx) => {
                 const selected = choices[q.id] === idx;

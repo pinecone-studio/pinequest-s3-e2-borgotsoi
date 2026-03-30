@@ -7,6 +7,7 @@ import type { GraphQLContext } from "./graphql-context";
 declare global {
   interface CloudflareEnv {
     DB: D1Database;
+    EXAM_FILES: R2Bucket;
   }
 }
 
@@ -23,7 +24,7 @@ const yoga = createYoga<GraphQLContext>({
 });
 
 export async function GET(request: Request) {
-  const { env, ctx } = getRequestContext<{ DB: D1Database }>();
+  const { env, ctx } = getRequestContext<{ DB: D1Database; EXAM_FILES: R2Bucket }>();
   return yoga.handleRequest(request, {
     db: env.DB,
     requestOrigin: new URL(request.url).origin,
@@ -36,7 +37,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { env, ctx } = getRequestContext<{ DB: D1Database }>();
+  const { env, ctx } = getRequestContext<{ DB: D1Database; EXAM_FILES: R2Bucket }>();
   return yoga.handleRequest(request, {
     db: env.DB,
     requestOrigin: new URL(request.url).origin,

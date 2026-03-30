@@ -13,4 +13,10 @@
       "migrations_dir": "drizzle",
     },
   ],
+  "r2_buckets": [
+    {
+      "binding": "EXAM_FILES",
+      "bucket_name": "exam-files",
+    },
+  ],
 }

@@ -42,5 +42,7 @@ export interface Question {
   dbId?: string;
   /** Bank variation label (A, B, …). */
   variation?: string;
+  /** Local file chosen before save; uploaded to R2 when the exam is created. */
+  pdfFile?: File | null;
 }
 

@@ -17,5 +17,6 @@ export const examQuestionsForTaker: QueryResolvers["examQuestionsForTaker"] =
       question: row.question,
       answers: row.answers,
       variation: row.variation,
+      attachmentKey: row.attachmentKey ?? null,
     }));
   };

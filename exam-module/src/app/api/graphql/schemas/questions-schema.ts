@@ -6,6 +6,10 @@ export const questionsTypeDefs = /* GraphQL */ `
     answers: [String!]!
     correctIndex: Int!
     variation: String!
+    """R2 object key when a file (e.g. PDF) is attached."""
+    attachmentKey: String
+    """Absolute URL to download the attachment (same origin /api/exam-file)."""
+    attachmentUrl: String
     createdAt: String!
     updatedAt: String!
   }
@@ -16,6 +20,7 @@ export const questionsTypeDefs = /* GraphQL */ `
     question: String!
     answers: [String!]!
     variation: String!
+    attachmentUrl: String
   }
 
   extend type Query {
@@ -31,6 +36,7 @@ export const questionsTypeDefs = /* GraphQL */ `
       answers: [String!]!
       correctIndex: Int!
       variation: String
+      attachmentKey: String
     ): Question!
 
     updateQuestion(
@@ -40,6 +46,7 @@ export const questionsTypeDefs = /* GraphQL */ `
       answers: [String!]
       correctIndex: Int
       variation: String
+      attachmentKey: String
     ): Question!
 
     deleteQuestion(id: ID!): Boolean!

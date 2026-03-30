@@ -54,6 +54,35 @@ export default function QuestionForm({
         </div>
       </div>
 
+      <div className="mb-4">
+        <label className="block text-xs text-gray-500 mb-1.5">PDF хавсралт (заавал биш)</label>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            className="text-xs text-gray-600 file:mr-2 file:rounded-md file:border file:border-gray-200 file:bg-white file:px-2 file:py-1"
+            onChange={(e) => {
+              const f = e.target.files?.[0] ?? null;
+              onChange({ ...question, pdfFile: f });
+            }}
+          />
+          {question.pdfFile ? (
+            <span className="text-xs text-gray-700 truncate max-w-[200px]" title={question.pdfFile.name}>
+              {question.pdfFile.name}
+            </span>
+          ) : null}
+          {question.pdfFile ? (
+            <button
+              type="button"
+              onClick={() => onChange({ ...question, pdfFile: null })}
+              className="text-xs text-red-600 border border-red-100 rounded-md px-2 py-1 hover:bg-red-50"
+            >
+              PDF арилгах
+            </button>
+          ) : null}
+        </div>
+      </div>
+
       <p className="text-xs text-gray-500 mb-2">Зөв хариултыг сонгоно уу</p>
       <div className="flex flex-wrap gap-2 items-start">
         {question.answers.map((ans, i) => (

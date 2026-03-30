@@ -75,6 +75,8 @@ export const questions = sqliteTable("questions", {
   variation: text("variation")
     .$default(() => "A")
     .notNull(),
+  /** R2 object key under the EXAM_FILES bucket (e.g. exams/{examId}/{uuid}.pdf). */
+  attachmentKey: text("attachment_key"),
   ...timestamps,
 });
 
