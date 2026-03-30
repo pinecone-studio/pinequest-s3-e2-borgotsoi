@@ -1,7 +1,7 @@
-mutation CreateClass($name: String!) {
+
+mutation createClass($name: String!) {
   createClass(name: $name) {
     id
     name
   }
 }
-

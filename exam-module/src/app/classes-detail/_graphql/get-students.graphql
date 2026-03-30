@@ -1,8 +1,6 @@
-query GetStudents {
-  getStudents {
-    email
+query GetClassesDetailPage {
+  getClasses {
     id
     name
-    classId
   }
 }
