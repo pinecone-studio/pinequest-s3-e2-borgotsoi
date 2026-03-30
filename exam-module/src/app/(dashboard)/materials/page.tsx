@@ -89,7 +89,7 @@ export default function MaterialsPage() {
       )}
 
       {loading && !data ? (
-        <p className="text-sm text-gray-500 mb-4">Уншиж байнаw…</p>
+        <p className="text-sm text-gray-500 mb-4">Уншиж байна…</p>
       ) : null}
 
       <div className="flex flex-wrap gap-10  mt-10">

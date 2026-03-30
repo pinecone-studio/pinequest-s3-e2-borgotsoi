@@ -40,6 +40,7 @@ export const staffTypeDefs = /* GraphQL */ `
       lastName: String!
       email: String!
       subjects: [String]
+      role: UserRole
     ): User!
     assignTeacherToClass(teacherId: ID!, classId: ID!): User!
     removeTeacherFromClass(teacherId: ID!, classId: ID!): User!

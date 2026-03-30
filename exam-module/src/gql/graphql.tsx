@@ -192,6 +192,7 @@ export type MutationCreateTeacherArgs = {
   email: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
   name: Scalars['String']['input'];
+  role?: InputMaybe<UserRole>;
   subjects?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -915,6 +916,7 @@ export type CreateTeacherMutationVariables = Exact<{
   lastName: Scalars['String']['input'];
   email: Scalars['String']['input'];
   subjects?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
+  role?: InputMaybe<UserRole>;
 }>;
 
 
@@ -986,6 +988,13 @@ export type CreateQuestionMutationVariables = Exact<{
 
 
 export type CreateQuestionMutation = { __typename?: 'Mutation', createQuestion: { __typename?: 'Question', id: string } };
+
+export type CreateSubjectMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
+
+
+export type CreateSubjectMutation = { __typename?: 'Mutation', createSubject: { __typename?: 'Subject', id: string, name: string, createdAt: string } };
 
 export type DeleteQuestionMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1283,12 +1292,13 @@ export type AssignTeacherToClassMutationHookResult = ReturnType<typeof useAssign
 export type AssignTeacherToClassMutationResult = Apollo.MutationResult<AssignTeacherToClassMutation>;
 export type AssignTeacherToClassMutationOptions = Apollo.BaseMutationOptions<AssignTeacherToClassMutation, AssignTeacherToClassMutationVariables>;
 export const CreateTeacherDocument = gql`
-    mutation CreateTeacher($name: String!, $lastName: String!, $email: String!, $subjects: [String]) {
+    mutation CreateTeacher($name: String!, $lastName: String!, $email: String!, $subjects: [String], $role: UserRole) {
   createTeacher(
     name: $name
     lastName: $lastName
     email: $email
     subjects: $subjects
+    role: $role
   ) {
     id
     name
@@ -1320,6 +1330,7 @@ export type CreateTeacherMutationFn = Apollo.MutationFunction<CreateTeacherMutat
  *      lastName: // value for 'lastName'
  *      email: // value for 'email'
  *      subjects: // value for 'subjects'
+ *      role: // value for 'role'
  *   },
  * });
  */
@@ -1743,6 +1754,41 @@ export function useCreateQuestionMutation(baseOptions?: Apollo.MutationHookOptio
 export type CreateQuestionMutationHookResult = ReturnType<typeof useCreateQuestionMutation>;
 export type CreateQuestionMutationResult = Apollo.MutationResult<CreateQuestionMutation>;
 export type CreateQuestionMutationOptions = Apollo.BaseMutationOptions<CreateQuestionMutation, CreateQuestionMutationVariables>;
+export const CreateSubjectDocument = gql`
+    mutation CreateSubject($name: String!) {
+  createSubject(name: $name) {
+    id
+    name
+    createdAt
+  }
+}
+    `;
+export type CreateSubjectMutationFn = Apollo.MutationFunction<CreateSubjectMutation, CreateSubjectMutationVariables>;
+
+/**
+ * __useCreateSubjectMutation__
+ *
+ * To run a mutation, you first call `useCreateSubjectMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSubjectMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSubjectMutation, { data, loading, error }] = useCreateSubjectMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateSubjectMutation(baseOptions?: Apollo.MutationHookOptions<CreateSubjectMutation, CreateSubjectMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSubjectMutation, CreateSubjectMutationVariables>(CreateSubjectDocument, options);
+      }
+export type CreateSubjectMutationHookResult = ReturnType<typeof useCreateSubjectMutation>;
+export type CreateSubjectMutationResult = Apollo.MutationResult<CreateSubjectMutation>;
+export type CreateSubjectMutationOptions = Apollo.BaseMutationOptions<CreateSubjectMutation, CreateSubjectMutationVariables>;
 export const DeleteQuestionDocument = gql`
     mutation DeleteQuestion($id: ID!) {
   deleteQuestion(id: $id)
