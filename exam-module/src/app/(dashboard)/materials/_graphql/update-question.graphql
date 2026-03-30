@@ -4,6 +4,7 @@ mutation UpdateQuestion(
   $answers: [String!]
   $correctIndex: Int
   $variation: String
+  $attachmentKey: String
 ) {
   updateQuestion(
     id: $id
@@ -11,6 +12,7 @@ mutation UpdateQuestion(
     answers: $answers
     correctIndex: $correctIndex
     variation: $variation
+    attachmentKey: $attachmentKey
   ) {
     id
   }

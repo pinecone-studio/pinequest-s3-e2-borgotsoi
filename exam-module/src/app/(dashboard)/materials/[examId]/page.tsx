@@ -92,6 +92,9 @@ export default function ExamVariationsHubPage() {
             answers: row.answers,
             correctIndex: row.correctIndex,
             variation: target,
+            ...(row.attachmentKey
+              ? { attachmentKey: row.attachmentKey }
+              : {}),
           },
         });
         if (!res.data?.createQuestion?.id) {

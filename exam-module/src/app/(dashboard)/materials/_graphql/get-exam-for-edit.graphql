@@ -9,5 +9,7 @@ query GetExamForEdit($examId: ID!) {
     answers
     correctIndex
     variation
+    attachmentKey
+    attachmentUrl
   }
 }

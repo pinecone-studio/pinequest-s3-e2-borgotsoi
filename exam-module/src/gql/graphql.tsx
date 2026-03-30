@@ -1004,7 +1004,7 @@ export type GetExamForEditQueryVariables = Exact<{
 }>;
 
 
-export type GetExamForEditQuery = { __typename?: 'Query', exam?: { __typename?: 'Exam', id: string, name: string } | null, questions: Array<{ __typename?: 'Question', id: string, question: string, answers: Array<string>, correctIndex: number, variation: string }> };
+export type GetExamForEditQuery = { __typename?: 'Query', exam?: { __typename?: 'Exam', id: string, name: string } | null, questions: Array<{ __typename?: 'Question', id: string, question: string, answers: Array<string>, correctIndex: number, variation: string, attachmentKey?: string | null, attachmentUrl?: string | null }> };
 
 export type TopicsBySubjectQueryVariables = Exact<{
   subjectId: Scalars['ID']['input'];
@@ -1027,6 +1027,7 @@ export type UpdateQuestionMutationVariables = Exact<{
   answers?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
   correctIndex?: InputMaybe<Scalars['Int']['input']>;
   variation?: InputMaybe<Scalars['String']['input']>;
+  attachmentKey?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -1833,6 +1834,8 @@ export const GetExamForEditDocument = gql`
     answers
     correctIndex
     variation
+    attachmentKey
+    attachmentUrl
   }
 }
     `;
@@ -1953,13 +1956,14 @@ export type UpdateExamMutationHookResult = ReturnType<typeof useUpdateExamMutati
 export type UpdateExamMutationResult = Apollo.MutationResult<UpdateExamMutation>;
 export type UpdateExamMutationOptions = Apollo.BaseMutationOptions<UpdateExamMutation, UpdateExamMutationVariables>;
 export const UpdateQuestionDocument = gql`
-    mutation UpdateQuestion($id: ID!, $question: String, $answers: [String!], $correctIndex: Int, $variation: String) {
+    mutation UpdateQuestion($id: ID!, $question: String, $answers: [String!], $correctIndex: Int, $variation: String, $attachmentKey: String) {
   updateQuestion(
     id: $id
     question: $question
     answers: $answers
     correctIndex: $correctIndex
     variation: $variation
+    attachmentKey: $attachmentKey
   ) {
     id
   }
@@ -1985,6 +1989,7 @@ export type UpdateQuestionMutationFn = Apollo.MutationFunction<UpdateQuestionMut
  *      answers: // value for 'answers'
  *      correctIndex: // value for 'correctIndex'
  *      variation: // value for 'variation'
+ *      attachmentKey: // value for 'attachmentKey'
  *   },
  * });
  */

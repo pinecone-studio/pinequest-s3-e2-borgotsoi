@@ -143,11 +143,11 @@ export default function CreateMaterialPage() {
         const p = payloads[i]!;
         const q = questions[i]!;
         let attachmentKey: string | undefined;
-        if (q.pdfFile) {
+        if (q.attachmentFile) {
           const fd = new FormData();
           fd.append("examId", examId);
-          fd.append("file", q.pdfFile);
-          const up = await fetch("/api/upload/question-pdf", {
+          fd.append("file", q.attachmentFile);
+          const up = await fetch("/api/upload/question-attachment", {
             method: "POST",
             body: fd,
           });
@@ -157,11 +157,11 @@ export default function CreateMaterialPage() {
           } | null;
           if (!up.ok) {
             throw new Error(
-              body?.error ?? "PDF оруулахад алдаа гарлаа. Дахин оролдоно уу.",
+              body?.error ?? "Файл оруулахад алдаа гарлаа. Дахин оролдоно уу.",
             );
           }
           if (!body?.key) {
-            throw new Error("PDF оруулахад алдаа гарлаа.");
+            throw new Error("Файл оруулахад алдаа гарлаа.");
           }
           attachmentKey = body.key;
         }
