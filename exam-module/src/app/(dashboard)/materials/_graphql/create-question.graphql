@@ -4,6 +4,7 @@ mutation CreateQuestion(
   $answers: [String!]!
   $correctIndex: Int!
   $variation: String
+  $attachmentKey: String
 ) {
   createQuestion(
     examId: $examId
@@ -11,6 +12,7 @@ mutation CreateQuestion(
     answers: $answers
     correctIndex: $correctIndex
     variation: $variation
+    attachmentKey: $attachmentKey
   ) {
     id
   }

@@ -8,5 +8,6 @@ query GetActiveExamTaking($examId: ID!) {
     question
     answers
     variation
+    attachmentUrl
   }
 }

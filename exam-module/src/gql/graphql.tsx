@@ -58,6 +58,7 @@ export type Exam = {
 export type ExamQuestionForTaker = {
   __typename?: 'ExamQuestionForTaker';
   answers: Array<Scalars['String']['output']>;
+  attachmentUrl?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   question: Scalars['String']['output'];
   variation: Scalars['String']['output'];
@@ -166,6 +167,7 @@ export type MutationCreateProctorLogArgs = {
 
 export type MutationCreateQuestionArgs = {
   answers: Array<Scalars['String']['input']>;
+  attachmentKey?: InputMaybe<Scalars['String']['input']>;
   correctIndex: Scalars['Int']['input'];
   examId: Scalars['ID']['input'];
   question: Scalars['String']['input'];
@@ -303,6 +305,7 @@ export type MutationUpdateProctorLogArgs = {
 
 export type MutationUpdateQuestionArgs = {
   answers?: InputMaybe<Array<Scalars['String']['input']>>;
+  attachmentKey?: InputMaybe<Scalars['String']['input']>;
   correctIndex?: InputMaybe<Scalars['Int']['input']>;
   examId?: InputMaybe<Scalars['ID']['input']>;
   id: Scalars['ID']['input'];
@@ -449,6 +452,10 @@ export type QueryVerifyStudentAccessArgs = {
 export type Question = {
   __typename?: 'Question';
   answers: Array<Scalars['String']['output']>;
+  /** R2 object key when a file (e.g. PDF) is attached. */
+  attachmentKey?: Maybe<Scalars['String']['output']>;
+  /** Absolute URL to download the attachment (same origin /api/exam-file). */
+  attachmentUrl?: Maybe<Scalars['String']['output']>;
   correctIndex: Scalars['Int']['output'];
   createdAt: Scalars['String']['output'];
   examId: Scalars['ID']['output'];
@@ -687,6 +694,7 @@ export type ExamResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type ExamQuestionForTakerResolvers<ContextType = any, ParentType extends ResolversParentTypes['ExamQuestionForTaker'] = ResolversParentTypes['ExamQuestionForTaker']> = {
   answers?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  attachmentUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   question?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   variation?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -783,6 +791,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type QuestionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Question'] = ResolversParentTypes['Question']> = {
   answers?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  attachmentKey?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  attachmentUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   correctIndex?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   examId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -971,6 +981,7 @@ export type CreateQuestionMutationVariables = Exact<{
   answers: Array<Scalars['String']['input']> | Scalars['String']['input'];
   correctIndex: Scalars['Int']['input'];
   variation?: InputMaybe<Scalars['String']['input']>;
+  attachmentKey?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -1068,7 +1079,7 @@ export type GetActiveExamTakingQueryVariables = Exact<{
 }>;
 
 
-export type GetActiveExamTakingQuery = { __typename?: 'Query', exam?: { __typename?: 'Exam', id: string, name: string } | null, examQuestionsForTaker: Array<{ __typename?: 'ExamQuestionForTaker', id: string, question: string, answers: Array<string>, variation: string }> };
+export type GetActiveExamTakingQuery = { __typename?: 'Query', exam?: { __typename?: 'Exam', id: string, name: string } | null, examQuestionsForTaker: Array<{ __typename?: 'ExamQuestionForTaker', id: string, question: string, answers: Array<string>, variation: string, attachmentUrl?: string | null }> };
 
 export type GetExamSessionForActiveExamQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1687,13 +1698,14 @@ export type GetProctorLogsLazyQueryHookResult = ReturnType<typeof useGetProctorL
 export type GetProctorLogsSuspenseQueryHookResult = ReturnType<typeof useGetProctorLogsSuspenseQuery>;
 export type GetProctorLogsQueryResult = Apollo.QueryResult<GetProctorLogsQuery, GetProctorLogsQueryVariables>;
 export const CreateQuestionDocument = gql`
-    mutation CreateQuestion($examId: ID!, $question: String!, $answers: [String!]!, $correctIndex: Int!, $variation: String) {
+    mutation CreateQuestion($examId: ID!, $question: String!, $answers: [String!]!, $correctIndex: Int!, $variation: String, $attachmentKey: String) {
   createQuestion(
     examId: $examId
     question: $question
     answers: $answers
     correctIndex: $correctIndex
     variation: $variation
+    attachmentKey: $attachmentKey
   ) {
     id
   }
@@ -1719,6 +1731,7 @@ export type CreateQuestionMutationFn = Apollo.MutationFunction<CreateQuestionMut
  *      answers: // value for 'answers'
  *      correctIndex: // value for 'correctIndex'
  *      variation: // value for 'variation'
+ *      attachmentKey: // value for 'attachmentKey'
  *   },
  * });
  */
@@ -2195,6 +2208,7 @@ export const GetActiveExamTakingDocument = gql`
     question
     answers
     variation
+    attachmentUrl
   }
 }
     `;

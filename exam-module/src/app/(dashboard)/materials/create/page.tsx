@@ -139,7 +139,32 @@ export default function CreateMaterialPage() {
         throw new Error("Шалгалт үүсгэгдсэнгүй.");
       }
 
-      for (const p of payloads) {
+      for (let i = 0; i < questions.length; i++) {
+        const p = payloads[i]!;
+        const q = questions[i]!;
+        let attachmentKey: string | undefined;
+        if (q.pdfFile) {
+          const fd = new FormData();
+          fd.append("examId", examId);
+          fd.append("file", q.pdfFile);
+          const up = await fetch("/api/upload/question-pdf", {
+            method: "POST",
+            body: fd,
+          });
+          const body = (await up.json().catch(() => null)) as {
+            error?: string;
+            key?: string;
+          } | null;
+          if (!up.ok) {
+            throw new Error(
+              body?.error ?? "PDF оруулахад алдаа гарлаа. Дахин оролдоно уу.",
+            );
+          }
+          if (!body?.key) {
+            throw new Error("PDF оруулахад алдаа гарлаа.");
+          }
+          attachmentKey = body.key;
+        }
         const qRes = await createQuestion({
           variables: {
             examId,
@@ -147,6 +172,7 @@ export default function CreateMaterialPage() {
             answers: p.answers,
             correctIndex: p.correctIndex,
             variation: "A",
+            attachmentKey,
           },
         });
         if (!qRes.data?.createQuestion?.id) {

@@ -3,6 +3,14 @@ import { questions as questionsTable } from "@/db/schema";
 import { MutationResolvers } from "@/gql/graphql";
 import { eq } from "drizzle-orm";
 
+function assertAttachmentKeyForExam(examId: string, key: string | null | undefined) {
+  if (key == null || key === "") return;
+  const prefix = `exams/${examId}/`;
+  if (!key.startsWith(prefix) || key.includes("..")) {
+    throw new Error("Invalid attachment key for this exam");
+  }
+}
+
 const epochToISOString = (value: unknown) => {
   const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n)) throw new Error("Invalid epoch timestamp");
@@ -12,10 +20,17 @@ const epochToISOString = (value: unknown) => {
 
 export const updateQuestion: MutationResolvers["updateQuestion"] = async (
   _,
-  { id, examId, question, answers, correctIndex, variation },
+  { id, examId, question, answers, correctIndex, variation, attachmentKey },
   context,
 ) => {
   const db = getDb(context.db);
+
+  const existing = await db
+    .select()
+    .from(questionsTable)
+    .where(eq(questionsTable.id, id))
+    .limit(1);
+  if (!existing[0]) throw new Error("Question not found");
 
   const patch: {
     examId?: string;
@@ -23,6 +38,7 @@ export const updateQuestion: MutationResolvers["updateQuestion"] = async (
     answers?: string[];
     correctIndex?: number;
     variation?: string;
+    attachmentKey?: string | null;
   } = {};
 
   if (examId !== undefined && examId !== null) patch.examId = examId;
@@ -32,6 +48,14 @@ export const updateQuestion: MutationResolvers["updateQuestion"] = async (
     patch.correctIndex = correctIndex;
   }
   if (variation !== undefined && variation !== null) patch.variation = variation;
+  if (attachmentKey !== undefined) {
+    patch.attachmentKey = attachmentKey ?? null;
+  }
+
+  const targetExamId = patch.examId ?? existing[0].examId;
+  if (attachmentKey !== undefined) {
+    assertAttachmentKeyForExam(targetExamId, attachmentKey ?? null);
+  }
 
   if (Object.keys(patch).length > 0) {
     await db.update(questionsTable).set(patch).where(eq(questionsTable.id, id));
@@ -53,6 +77,7 @@ export const updateQuestion: MutationResolvers["updateQuestion"] = async (
     answers: row.answers,
     correctIndex: row.correctIndex,
     variation: row.variation,
+    attachmentKey: row.attachmentKey ?? null,
     createdAt: epochToISOString(row.createdAt),
     updatedAt: epochToISOString(row.updatedAt),
   };
