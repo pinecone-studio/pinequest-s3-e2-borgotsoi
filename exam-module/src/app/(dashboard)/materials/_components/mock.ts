@@ -42,7 +42,11 @@ export interface Question {
   dbId?: string;
   /** Bank variation label (A, B, …). */
   variation?: string;
-  /** Local file chosen before save; uploaded to R2 when the exam is created. */
-  pdfFile?: File | null;
+  /** Local file chosen before save; uploaded to R2 when the exam is saved. */
+  attachmentFile?: File | null;
+  /** Server-side R2 key when editing an existing question (no local file). */
+  attachmentKey?: string | null;
+  /** True if this row had an attachment when loaded from the server (used to send explicit null on clear). */
+  hadAttachmentAtLoad?: boolean;
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE `questions` ADD `attachment_key` text;

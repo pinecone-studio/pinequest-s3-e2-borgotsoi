@@ -25,6 +25,7 @@ function mapRowsToQuestions(
     answers: string[];
     correctIndex: number;
     variation: string;
+    attachmentKey?: string | null;
   }>,
 ): Question[] {
   return rows.map((q, i) => ({
@@ -35,7 +36,35 @@ function mapRowsToQuestions(
     correctIndex: q.correctIndex,
     score: 2,
     variation: q.variation,
+    attachmentKey: q.attachmentKey ?? null,
+    hadAttachmentAtLoad: Boolean(q.attachmentKey),
   }));
+}
+
+async function uploadQuestionAttachment(
+  examId: string,
+  file: File,
+): Promise<string> {
+  const fd = new FormData();
+  fd.append("examId", examId);
+  fd.append("file", file);
+  const up = await fetch("/api/upload/question-attachment", {
+    method: "POST",
+    body: fd,
+  });
+  const body = (await up.json().catch(() => null)) as {
+    error?: string;
+    key?: string;
+  } | null;
+  if (!up.ok) {
+    throw new Error(
+      body?.error ?? "Файл оруулахад алдаа гарлаа. Дахин оролдоно уу.",
+    );
+  }
+  if (!body?.key) {
+    throw new Error("Файл оруулахад алдаа гарлаа.");
+  }
+  return body.key;
 }
 
 function emptyRow(
@@ -185,6 +214,26 @@ export default function EditVariationPage() {
           return;
         }
 
+        let attachmentKeyVar: string | null | undefined = undefined;
+        if (q.attachmentFile) {
+          attachmentKeyVar = await uploadQuestionAttachment(
+            examId,
+            q.attachmentFile,
+          );
+        } else if (
+          q.dbId &&
+          q.hadAttachmentAtLoad &&
+          !q.attachmentKey &&
+          !q.attachmentFile
+        ) {
+          attachmentKeyVar = null;
+        }
+
+        const attachmentVars =
+          attachmentKeyVar !== undefined
+            ? { attachmentKey: attachmentKeyVar }
+            : {};
+
         if (q.dbId) {
           await updateQuestion({
             variables: {
@@ -193,6 +242,7 @@ export default function EditVariationPage() {
               answers: payload.answers,
               correctIndex: payload.correctIndex,
               variation: variationLabel,
+              ...attachmentVars,
             },
           });
         } else {
@@ -203,6 +253,7 @@ export default function EditVariationPage() {
               answers: payload.answers,
               correctIndex: payload.correctIndex,
               variation: variationLabel,
+              ...attachmentVars,
             },
           });
           if (!res.data?.createQuestion?.id) {
