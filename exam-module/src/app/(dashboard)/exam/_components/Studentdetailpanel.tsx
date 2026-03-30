@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { StudentDetail } from "./studentmock";
 
 interface StudentDetailPanelProps {
@@ -50,11 +51,14 @@ export default function StudentDetailPanel({
             </div>
 
             {q.image && (
-              <div className="w-48 h-32 bg-yellow-50 border border-gray-200 rounded-lg overflow-hidden">
-                <img
+              <div className="relative w-48 h-32 bg-yellow-50 border border-gray-200 rounded-lg overflow-hidden">
+                <Image
                   src={q.image}
                   alt="question"
-                  className="w-full h-full object-contain"
+                  fill
+                  className="object-contain"
+                  sizes="192px"
+                  unoptimized
                 />
               </div>
             )}

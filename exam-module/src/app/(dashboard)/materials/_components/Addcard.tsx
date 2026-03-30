@@ -72,8 +72,9 @@ export default function AddCard({ onClick }: AddCardProps) {
 
               input.click();
 
-              input.onchange = (e: any) => {
-                const file = e.target.files?.[0];
+              input.onchange = (e: Event) => {
+                const target = e.target as HTMLInputElement;
+                const file = target.files?.[0];
                 if (file) {
                   console.log("Selected file:", file);
                 }
