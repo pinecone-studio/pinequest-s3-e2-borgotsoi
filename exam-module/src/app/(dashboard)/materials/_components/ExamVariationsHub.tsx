@@ -100,26 +100,77 @@ export default function ExamVariationsHub({
 
     const target = nextBatchVariationLabel(questions.map((q) => q.variation));
     setDupLoadingLabel(label);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 120_000);
     try {
-      for (const row of rows) {
-        const res = await createQuestion({
+      const sorted = [...rows].sort((a, b) => a.id.localeCompare(b.id));
+      const payload = sorted.map((row) => ({
+        question: row.question,
+        answers: row.answers,
+        correctIndex: row.correctIndex,
+      }));
+
+      let res: Response;
+      try {
+        res = await fetch("/api/generate-variant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ questions: payload }),
+          signal: controller.signal,
+        });
+      } catch (fetchErr) {
+        if (fetchErr instanceof Error && fetchErr.name === "AbortError") {
+          throw new Error("Хугацаа хэтэрлээ. Дахин оролдоно уу.");
+        }
+        throw new Error(
+          fetchErr instanceof Error
+            ? fetchErr.message
+            : "Серверт холбогдож чадсангүй.",
+        );
+      }
+
+      let data: {
+        error?: string;
+        questions?: Array<{
+          question: string;
+          answers: string[];
+          correctIndex: number;
+        }>;
+      };
+      try {
+        data = (await res.json()) as typeof data;
+      } catch {
+        throw new Error("Серверийн хариу буруу байна.");
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error ?? "Үүсгэхэд алдаа гарлаа.");
+      }
+
+      const generated = data.questions;
+      if (!generated?.length) {
+        throw new Error("Серверээс асуулт ирээгүй.");
+      }
+
+      for (const row of generated) {
+        const createRes = await createQuestion({
           variables: {
             examId,
             question: row.question,
             answers: row.answers,
             correctIndex: row.correctIndex,
             variation: target,
-            ...(row.attachmentKey ? { attachmentKey: row.attachmentKey } : {}),
           },
         });
-        if (!res.data?.createQuestion?.id) {
-          throw new Error("Асуулт хуулагдсангүй.");
+        if (!createRes.data?.createQuestion?.id) {
+          throw new Error("Асуулт хадгалагдсангүй.");
         }
       }
       await refetch();
     } catch (e) {
-      setHubError(e instanceof Error ? e.message : "Хуулахад алдаа гарлаа.");
+      setHubError(e instanceof Error ? e.message : "Үүсгэхэд алдаа гарлаа.");
     } finally {
+      window.clearTimeout(timeoutId);
       setDupLoadingLabel(null);
     }
   };
@@ -328,6 +379,28 @@ export default function ExamVariationsHub({
         </div>
       ) : (
         <>
+          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+            <label className="flex flex-col gap-1 text-sm text-gray-700 sm:flex-row sm:items-center">
+              <span className="font-medium shrink-0">Эх хувилбар:</span>
+              <select
+                value={duplicateSourceLabel}
+                onChange={(e) => setDuplicateSourceLabel(e.target.value)}
+                disabled={dupLoadingLabel !== null}
+                className="min-w-[200px] rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition-shadow focus:border-[#C7D2FE] focus:ring-2 focus:ring-[#E0E7FF] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {labels.map((l) => (
+                  <option key={l} value={l}>
+                    Вариант {l} ({grouped.get(l)?.length ?? 0} асуулт)
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="text-xs text-gray-500 max-w-xl">
+              Сонгосон хувилбарын асуултуудын түвшинтэй ижил хэцүү байдлын шинэ
+              асуултууд AI-аар үүсгэгдэнэ (хуулбар биш).
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <button
               type="button"
@@ -362,7 +435,7 @@ export default function ExamVariationsHub({
               <div className="absolute bottom-4 inset-x-4 rounded-lg border border-[#B0C4DE] bg-white px-3 py-2 text-center shadow-sm">
                 <span className="text-sm font-medium text-gray-900">
                   {dupLoadingLabel === duplicateSourceLabel
-                    ? "Хуулж байна…"
+                    ? "Үүсгэж байна…"
                     : "Вариант үүсгэх"}
                 </span>
               </div>
