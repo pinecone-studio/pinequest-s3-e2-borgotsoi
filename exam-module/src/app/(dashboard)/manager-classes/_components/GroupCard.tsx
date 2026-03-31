@@ -1,11 +1,12 @@
 "use client";
 
-import { useGetStudentsByClasssQuery } from "@/gql/graphql";
+import { GetClassesQuery, useGetStudentsByClasssQuery } from "@/gql/graphql";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, Loader2 } from "lucide-react";
 
+type Class = NonNullable<GetClassesQuery["getClasses"]>[number];
 interface GroupCardProps {
-  cls: any;
+  cls: Class;
   onClick: () => void;
 }
 
@@ -13,8 +14,12 @@ export function GroupCard({ cls, onClick }: GroupCardProps) {
   const { data, loading } = useGetStudentsByClasssQuery({
     variables: { classId: cls.id },
   });
+  const students =
+    (data?.studentsByClass as {
+      id: string;
+      name?: string | null;
+    }[]) || [];
 
-  const students = data?.studentsByClass || [];
   const count = students.length;
 
   return (

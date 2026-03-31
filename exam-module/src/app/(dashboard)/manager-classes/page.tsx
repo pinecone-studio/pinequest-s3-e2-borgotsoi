@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useGetClassesQuery, useGetStaffUsersQuery } from "@/gql/graphql";
+import {
+  GetClassesQuery,
+  useGetClassesQuery,
+  useGetStaffUsersQuery,
+} from "@/gql/graphql";
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Users } from "lucide-react";
@@ -11,11 +15,12 @@ import { StudentTable } from "./_components/StudentSection";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GroupCard } from "./_components/GroupCard";
 
+type Class = GetClassesQuery["getClasses"][number];
+
 export default function ClassesPage() {
   const [view, setView] = useState<"grid" | "groups" | "students">("grid");
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
-  const [selectedGroup, setSelectedGroup] = useState<any | null>(null);
-
+  const [selectedGroup, setSelectedGroup] = useState<Class | null>(null);
   const {
     data: classesData,
     loading: classesLoading,
@@ -32,24 +37,32 @@ export default function ClassesPage() {
 
   const groupedByGrade = useMemo(() => {
     if (!classesData?.getClasses) return {};
-    return classesData.getClasses.reduce((acc: any, curr: any) => {
-      const gradeMatch = curr.name.match(/^(\d+)/);
-      const gradeNumber = gradeMatch ? gradeMatch[1] : curr.name;
 
-      const gradeKey = `${gradeNumber}-р анги`;
+    return classesData.getClasses.reduce<Record<string, Class[]>>(
+      (acc, curr) => {
+        const gradeMatch = curr.name.match(/^(\d+)/);
+        const gradeNumber = gradeMatch ? gradeMatch[1] : curr.name;
 
-      if (!acc[gradeKey]) acc[gradeKey] = [];
-      acc[gradeKey].push(curr);
-      return acc;
-    }, {});
+        const gradeKey = `${gradeNumber}-р анги`;
+
+        if (!acc[gradeKey]) acc[gradeKey] = [];
+        acc[gradeKey].push(curr);
+
+        return acc;
+      },
+      {},
+    );
   }, [classesData]);
 
-  const displayGrades = Object.keys(groupedByGrade).map((grade) => ({
-    grade,
-    count: groupedByGrade[grade].length,
-    classes: groupedByGrade[grade],
-  }));
+  const displayGrades = Object.entries(groupedByGrade).map(
+    ([grade, classes]) => ({
+      grade,
+      count: classes.length,
+      classes,
+    }),
+  );
 
+  const groups = selectedGrade ? (groupedByGrade[selectedGrade] ?? []) : [];
   const cardColors = [
     "bg-blue-100",
     "bg-purple-100",
@@ -108,7 +121,7 @@ export default function ClassesPage() {
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {groupedByGrade[selectedGrade].map((cls: any) => (
+              {groupedByGrade[selectedGrade].map((cls) => (
                 <GroupCard
                   key={cls.id}
                   cls={cls}
