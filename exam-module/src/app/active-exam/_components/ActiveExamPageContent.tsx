@@ -2,7 +2,7 @@
 
 import { useLiveKitExamPublisher } from "@/hooks/useLiveKitExamPublisher";
 import { useProctor } from "@/providers/ProctorProvider";
-import { useAudioProctor } from "@/providers/SpeechRecognizeProvider";
+import { useVoiceProctoring } from "@/hooks/useVoiceProctoring";
 import {
   useCreateProctorLogMutation,
   useGetExamSessionForActiveExamQuery,
@@ -74,7 +74,6 @@ export function ActiveExamPageContent() {
   );
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const audioCanvasRef = useRef<HTMLCanvasElement>(null);
   const lastFlagTime = useRef<Record<string, number>>({});
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [examMediaStream, setExamMediaStream] = useState<MediaStream | null>(
@@ -438,7 +437,10 @@ export function ActiveExamPageContent() {
   });
 
   useProctor(videoRef, reportFlag, examWindowActive);
-  useAudioProctor(reportFlag, audioCanvasRef, examWindowActive);
+  const { isSpeechDetected } = useVoiceProctoring({
+    onFlag: reportFlag,
+    enabled: examWindowActive,
+  });
 
   useLiveKitExamPublisher({
     roomName: examSessionId || null,
@@ -564,8 +566,8 @@ export function ActiveExamPageContent() {
 
         <ProctoringDashboard
           videoRef={videoRefCallback}
-          audioCanvasRef={audioCanvasRef}
           isReady={isCameraReady}
+          isSpeechDetected={isSpeechDetected}
         />
       </main>
     </div>

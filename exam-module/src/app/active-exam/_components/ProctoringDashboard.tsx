@@ -1,14 +1,13 @@
 interface ProctorProps {
-  /** Ref or callback ref — stream must attach after the element exists (not on first page mount). */
   videoRef: React.Ref<HTMLVideoElement>;
-  audioCanvasRef: React.RefObject<HTMLCanvasElement | null>;
   isReady: boolean;
+  isSpeechDetected: boolean;
 }
 
 export const ProctoringDashboard = ({
   videoRef,
-  audioCanvasRef,
   isReady,
+  isSpeechDetected,
 }: ProctorProps) => {
   return (
     <div className="space-y-6">
@@ -22,15 +21,32 @@ export const ProctoringDashboard = ({
           className={`w-full h-full object-cover transition-opacity duration-700 ${isReady ? "opacity-100 grayscale" : "opacity-0"}`}
         />
 
-        {/* Audio Visualizer Overlay */}
+        {/* Speech Detection Indicator */}
         {isReady && (
-          <div className="absolute bottom-0 left-0 w-full h-10 bg-black/60 backdrop-blur-md border-t border-white/10">
-            <canvas
-              ref={audioCanvasRef}
-              className="w-full h-full"
-              width={300}
-              height={40}
-            />
+          <div
+            className={`absolute bottom-0 left-0 w-full flex items-center gap-2 px-3 py-2 backdrop-blur-md border-t transition-colors duration-300 ${
+              isSpeechDetected
+                ? "bg-red-900/60 border-red-500/40"
+                : "bg-black/60 border-white/10"
+            }`}
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              {isSpeechDetected && (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+              )}
+              <span
+                className={`relative inline-flex h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
+                  isSpeechDetected ? "bg-red-500" : "bg-slate-500"
+                }`}
+              />
+            </span>
+            <span
+              className={`text-[10px] font-semibold uppercase tracking-widest transition-colors duration-300 ${
+                isSpeechDetected ? "text-red-300" : "text-slate-400"
+              }`}
+            >
+              {isSpeechDetected ? "Speech Detected" : "Audio Monitoring"}
+            </span>
           </div>
         )}
 
@@ -53,7 +69,7 @@ export const ProctoringDashboard = ({
         </div>
         <p className="text-[10px] text-slate-500 uppercase leading-relaxed">
           Biometric patterns & audio frequencies are being processed locally for
-          privacy complianc
+          privacy compliance
         </p>
       </div>
     </div>

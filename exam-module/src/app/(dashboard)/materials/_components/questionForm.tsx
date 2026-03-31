@@ -104,22 +104,6 @@ export default function QuestionForm({
   }, [question.attachmentFile, question.attachmentKey]);
 
   const fileLabel = question.attachmentFile?.name ?? null;
-  const handleRemoveAnswer = (idxToRemove: number) => {
-    const newAnswers = question.answers.filter((_, i) => i !== idxToRemove);
-
-    let newCorrect = question.correctIndex;
-    if (question.correctIndex === idxToRemove) {
-      newCorrect = 0;
-    } else if (question.correctIndex > idxToRemove) {
-      newCorrect -= 1;
-    }
-
-    onChange({
-      ...question,
-      answers: newAnswers,
-      correctIndex: newCorrect,
-    });
-  };
   return (
     <div className="bg-[#F8F9FD] border border-gray-100 rounded-[32px] p-8 mb-6 relative shadow-sm transition-all hover:shadow-md">
       <div className="flex items-center justify-between mb-6 border-b border-gray-200/60 pb-5">
@@ -148,6 +132,7 @@ export default function QuestionForm({
         <div className="mb-6 relative inline-block group">
           {isImagePreview ? (
             <div className="rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-white max-w-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element -- blob / API preview URL */}
               <img
                 src={displayUrl}
                 alt="preview"

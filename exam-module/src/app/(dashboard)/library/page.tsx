@@ -9,9 +9,9 @@ import {
   useCreateSubjectMutation,
   useCreateTopicMutation,
   GetExamCreateOptionsDocument,
-  useGetExamsQuery,
   useGetExamQuery,
   useUpdateexamMutation,
+  type GetExamQuery,
 } from "@/gql/graphql";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -44,7 +44,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { MoreVertical, Edit2 } from "lucide-react";
-import { useUpdateExamMutation } from "@/gql/graphql";
+
+type ExamRow = NonNullable<GetExamQuery["exams"]>[number];
 
 const gradientForId = (name: string) => {
   const colors = [
@@ -58,7 +59,7 @@ const gradientForId = (name: string) => {
 };
 
 export default function LibraryPage() {
-  const [search, setSearch] = useState("");
+  const [search] = useState("");
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("exam");
 
@@ -71,7 +72,7 @@ export default function LibraryPage() {
   const [newSubjectName, setNewSubjectName] = useState("");
   const [newTopicName, setNewTopicName] = useState("");
   const [topicGrade, setTopicGrade] = useState("10");
-  const [editingExam, setEditingExam] = useState<any>(null);
+  const [editingExam, setEditingExam] = useState<ExamRow | null>(null);
 
   const [updateExam, { loading: updating }] = useUpdateexamMutation({
     refetchQueries: [{ query: GetExamsDocument }],
@@ -139,7 +140,7 @@ export default function LibraryPage() {
       await createSubject({ variables: { name: newSubjectName.trim() } });
       toast.success(`"${newSubjectName}" хичээл бүртгэгдлээ`);
       setNewSubjectName("");
-    } catch (e) {
+    } catch {
       toast.error("Хичээл бүртгэхэд алдаа гарлаа");
     }
   };
@@ -155,12 +156,12 @@ export default function LibraryPage() {
     });
     setNewTopicName("");
   };
-  const handleEditClick = (exam: any) => {
+  const handleEditClick = (exam: ExamRow) => {
     setEditingExam(exam);
     setExamName(exam.name);
-    setCreatorId(exam.creatorId);
-    setSubjectId(exam.subjectId);
-    setTopicId(exam.topicId);
+    setCreatorId(exam.creatorId ?? "");
+    setSubjectId(exam.subjectId ?? "");
+    setTopicId(exam.topicId ?? "");
     setActiveTab("exam");
     setOpen(true);
   };
