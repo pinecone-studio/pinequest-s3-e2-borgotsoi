@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { useState, useMemo } from "react";
 
 import {
@@ -12,7 +14,6 @@ import {
   GetExamCreateOptionsDocument,
   useGetExamQuery,
   useUpdateexamMutation,
-  type GetExamQuery,
 } from "@/gql/graphql";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
