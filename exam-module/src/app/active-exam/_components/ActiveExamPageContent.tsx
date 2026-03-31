@@ -370,8 +370,17 @@ export function ActiveExamPageContent() {
   );
 
   const examWindowActive =
-    legacyLink ||
-    (sessionTimeState === "active" && !sessionAlreadyFinished);
+    legacyLink || (sessionTimeState === "active" && !sessionAlreadyFinished);
+
+  // ── Exam integrity: offline detection, tab-switch, copy-paste block, idle ──
+  const integrityActive = examWindowActive && !submitted;
+  useExamIntegrity({
+    active: integrityActive,
+    reportFlag,
+    studentId,
+    examId: effectiveExamId || undefined,
+    sessionId: examSessionId || undefined,
+  });
 
   useProctor(videoRef, reportFlag, examWindowActive);
   const { isSpeechDetected } = useVoiceProctoring({
@@ -491,9 +500,9 @@ export function ActiveExamPageContent() {
         <ActiveExamQuestionsColumn
           displayQuestions={displayQuestions}
           choices={choices}
-          onChoiceChange={(questionId, answerIndex) =>
-            setChoices((prev) => ({ ...prev, [questionId]: answerIndex }))
-          }
+          onChoiceChange={(questionId, answerIndex) => {
+            setChoices((prev) => ({ ...prev, [questionId]: answerIndex }));
+          }}
           inputsDisabled={inputsDisabled}
           submitted={submitted}
           submitMutationLoading={submitMutationLoading}
