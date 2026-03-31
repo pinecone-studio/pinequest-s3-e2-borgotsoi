@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -106,29 +105,33 @@ export default function CreateMaterialPage() {
     setQuestions((prev) => prev.filter((q) => q.id !== id));
   };
 
-  const handleDocxUpload = useCallback(
-    async (file: File) => {
-      setError(null);
-      setParsing(true);
-      try {
-        const mammoth = await import("mammoth");
-        const arrayBuffer = await file.arrayBuffer();
+  const handleDocxUpload = useCallback(async (file: File) => {
+    setError(null);
+    setParsing(true);
+    try {
+      const mammoth = await import("mammoth");
+      const arrayBuffer = await file.arrayBuffer();
 
-        const extractedImages: File[] = [];
+      const extractedImages: File[] = [];
 
-        const result = await mammoth.convertToHtml(
-          { arrayBuffer },
-          {
-            convertImage: mammoth.images.imgElement(async (image) => {
+      const result = await mammoth.convertToHtml(
+        { arrayBuffer },
+        {
+          convertImage: mammoth.images.imgElement(
+            async (image: {
+              read: (enc: string) => Promise<string>;
+              contentType?: string;
+            }) => {
               const base64 = await image.read("base64");
               const binary = atob(base64);
               const bytes = new Uint8Array(binary.length);
               for (let j = 0; j < binary.length; j++) {
                 bytes[j] = binary.charCodeAt(j);
               }
-              const ext = (image.contentType ?? "image/png")
-                .split("/")[1]
-                ?.replace("jpeg", "jpg") ?? "png";
+              const ext =
+                (image.contentType ?? "image/png")
+                  .split("/")[1]
+                  ?.replace("jpeg", "jpg") ?? "png";
               const idx = extractedImages.length + 1;
               extractedImages.push(
                 new File([bytes], `image-${idx}.${ext}`, {
@@ -136,93 +139,92 @@ export default function CreateMaterialPage() {
                 }),
               );
               return { src: `__IMAGE_MARKER_${idx}__` };
-            }),
-          },
-        );
+            },
+          ),
+        },
+      );
 
-        let html = result.value;
-        html = html.replace(
-          /<img[^>]*src="__IMAGE_MARKER_(\d+)__"[^>]*>/g,
-          (_match, idx) => `[IMAGE_${idx}]`,
-        );
-        const text = html
-          .replace(/<br\s*\/?>/gi, "\n")
-          .replace(/<\/p>/gi, "\n")
-          .replace(/<\/li>/gi, "\n")
-          .replace(/<\/tr>/gi, "\n")
-          .replace(/<[^>]+>/g, "")
-          .replace(/&amp;/g, "&")
-          .replace(/&lt;/g, "<")
-          .replace(/&gt;/g, ">")
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'")
-          .replace(/&nbsp;/g, " ")
-          .replace(/\n{3,}/g, "\n\n")
-          .trim();
+      let html = result.value;
+      html = html.replace(
+        /<img[^>]*src="__IMAGE_MARKER_(\d+)__"[^>]*>/g,
+        (_match: string, idx: string) => `[IMAGE_${idx}]`,
+      );
+      const text = html
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<\/p>/gi, "\n")
+        .replace(/<\/li>/gi, "\n")
+        .replace(/<\/tr>/gi, "\n")
+        .replace(/<[^>]+>/g, "")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&nbsp;/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
 
-        if (!text) {
-          setError("Word файлаас текст олдсонгүй.");
-          return;
-        }
+      if (!text) {
+        setError("Word файлаас текст олдсонгүй.");
+        return;
+      }
 
-        const res = await fetch("/api/parse-exam-questions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text }),
-        });
-        const body = (await res.json().catch(() => null)) as {
-          questions?: Array<{
-            question: string;
-            answers: string[];
-            imageMarker: string | null;
-          }>;
-          error?: string;
-        } | null;
+      const res = await fetch("/api/parse-exam-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const body = (await res.json().catch(() => null)) as {
+        questions?: Array<{
+          question: string;
+          answers: string[];
+          imageMarker: string | null;
+        }>;
+        error?: string;
+      } | null;
 
-        if (!res.ok || !body?.questions) {
-          throw new Error(
-            body?.error ?? "Асуултуудыг задлахад алдаа гарлаа.",
-          );
-        }
+      if (!res.ok || !body?.questions) {
+        throw new Error(body?.error ?? "Асуултуудыг задлахад алдаа гарлаа.");
+      }
 
-        const now = Date.now();
-        const parsed: Question[] = body.questions.map((q, i) => {
-          let attachmentFile: File | null = null;
-          if (q.imageMarker) {
-            const match = q.imageMarker.match(/\d+/);
-            if (match) {
-              const imgIdx = parseInt(match[0], 10) - 1;
-              if (imgIdx >= 0 && imgIdx < extractedImages.length) {
-                attachmentFile = extractedImages[imgIdx];
-              }
+      const now = Date.now();
+      const parsed: Question[] = body.questions.map((q, i) => {
+        let attachmentFile: File | null = null;
+        if (q.imageMarker) {
+          const match = q.imageMarker.match(/\d+/);
+          if (match) {
+            const imgIdx = parseInt(match[0], 10) - 1;
+            if (imgIdx >= 0 && imgIdx < extractedImages.length) {
+              attachmentFile = extractedImages[imgIdx];
             }
           }
-          return {
-            id: now + i,
-            text: q.question,
-            answers: q.answers.length >= 2 ? q.answers : ["", "", ""],
-            score: 2,
-            correctIndex: 0,
-            attachmentFile,
-          };
-        });
-
-        if (parsed.length === 0) {
-          setError("Файлаас асуулт олдсонгүй.");
-          return;
         }
+        return {
+          id: now + i,
+          text: q.question,
+          answers: q.answers.length >= 2 ? q.answers : ["", "", ""],
+          score: 2,
+          correctIndex: 0,
+          attachmentFile,
+        };
+      });
 
-        setQuestions(parsed);
-      } catch (e) {
-        setError(
-          e instanceof Error ? e.message : "Word файл боловсруулахад алдаа гарлаа.",
-        );
-      } finally {
-        setParsing(false);
+      if (parsed.length === 0) {
+        setError("Файлаас асуулт олдсонгүй.");
+        return;
       }
-    },
-    [],
-  );
+
+      setQuestions(parsed);
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Word файл боловсруулахад алдаа гарлаа.",
+      );
+    } finally {
+      setParsing(false);
+    }
+  }, []);
 
   const handleSave = async () => {
     setError(null);
