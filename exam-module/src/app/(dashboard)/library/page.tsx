@@ -12,6 +12,7 @@ import {
   GetExamCreateOptionsDocument,
   useGetExamQuery,
   useUpdateexamMutation,
+  type GetExamQuery,
 } from "@/gql/graphql";
 
 type ExamRow = GetExamQuery["exams"][number];

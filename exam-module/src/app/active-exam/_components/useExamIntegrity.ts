@@ -164,7 +164,7 @@ export function useExamIntegrity({
   sessionId,
   onOnlineChange,
 }: UseExamIntegrityOptions) {
-  const isOnlineRef = useRef(navigator.onLine);
+  const isOnlineRef = useRef(typeof navigator !== "undefined" ? navigator.onLine : true);
   const lastActivityRef = useRef(0);
   const idleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const idleFlaggedRef = useRef(false);

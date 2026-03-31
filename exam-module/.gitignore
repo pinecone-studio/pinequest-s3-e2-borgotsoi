@@ -42,6 +42,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# vad assets (copied from node_modules at build time)
+/public/vad-assets/
+
 .wrangler/
 .next-on-pages/
 dist/

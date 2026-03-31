@@ -37,6 +37,8 @@ function localStartEndToUtcIso(
   startTimeStr: string,
   endTimeStr: string,
 ): { startTime: string; endTime: string } {
+  console.log("localStartEndToUtcIso", dateStr, startTimeStr, endTimeStr);
+
   const [y, m, d] = dateStr.split("-").map(Number);
   const startParts = (startTimeStr || "00:00").split(":");
   const endParts = (endTimeStr || "23:59").split(":");
@@ -99,6 +101,23 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
     e.preventDefault();
 
     const creatorId = getCreatorIdFromStorage();
+    // #region agent log
+    fetch("http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "e79d81",
+      },
+      body: JSON.stringify({
+        sessionId: "e79d81",
+        location: "NewAssigmentModal.tsx:handleSubmit",
+        message: "handleSubmit called",
+        data: { creatorId, formData },
+        timestamp: Date.now(),
+        hypothesisId: "H1,H2,H3",
+      }),
+    }).catch(() => {});
+    // #endregion
     if (!creatorId) {
       alert("Хэрэглэгчийн мэдээлэл олдсонгүй. Дахин нэвтэрнэ үү.");
       return;
@@ -110,6 +129,31 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
       !formData.date ||
       !formData.description
     ) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "e79d81",
+          },
+          body: JSON.stringify({
+            sessionId: "e79d81",
+            location: "NewAssigmentModal.tsx:validation",
+            message: "validation failed",
+            data: {
+              examId: formData.examId,
+              classId: formData.classId,
+              date: formData.date,
+              description: formData.description,
+            },
+            timestamp: Date.now(),
+            hypothesisId: "H2",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       alert("Та бүх заавал бөглөх талбарыг бөглөнө үү!");
       return;
     }
@@ -121,8 +165,62 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
         formData.endTime || "23:59",
       );
 
+    // #region agent log
+    fetch("http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "e79d81",
+      },
+      body: JSON.stringify({
+        sessionId: "e79d81",
+        location: "NewAssigmentModal.tsx:preMutation",
+        message: "about to call mutation",
+        data: {
+          examId: formData.examId,
+          classId: formData.classId,
+          creatorId,
+          description: formData.description,
+          startTime: formattedStart,
+          endTime: formattedEnd,
+        },
+        timestamp: Date.now(),
+        hypothesisId: "H3,H4",
+      }),
+    }).catch(() => {});
+    // #endregion
+
+    // #region agent log
+    fetch("http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Debug-Session-Id": "95efae",
+      },
+      body: JSON.stringify({
+        sessionId: "95efae",
+        location: "NewAssigmentModal.tsx:164",
+        message: "pre-mutation variables",
+        data: {
+          rawDate: formData.date,
+          rawStartTime: formData.startTime,
+          rawEndTime: formData.endTime,
+          formattedStart,
+          formattedEnd,
+          formattedStartType: typeof formattedStart,
+          formattedEndType: typeof formattedEnd,
+        },
+        timestamp: Date.now(),
+        hypothesisId: "H1,H4",
+      }),
+    }).catch(() => {});
+    // #endregion
+
     try {
-      await createExamSession({
+      console.log("formattedStart", formattedStart);
+      console.log("formattedEnd", formattedEnd);
+
+      const result = await createExamSession({
         variables: {
           examId: formData.examId,
           classId: formData.classId,
@@ -133,9 +231,77 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
         },
       });
 
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "e79d81",
+          },
+          body: JSON.stringify({
+            sessionId: "e79d81",
+            location: "NewAssigmentModal.tsx:success",
+            message: "mutation succeeded",
+            data: { result: result?.data },
+            timestamp: Date.now(),
+            hypothesisId: "H4",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
+
       alert("Шалгалт амжилттай үүсгэгдлээ!");
       onClose();
     } catch (err) {
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "e79d81",
+          },
+          body: JSON.stringify({
+            sessionId: "e79d81",
+            location: "NewAssigmentModal.tsx:catch",
+            message: "mutation error",
+            data: {
+              errorMessage: (err as Error)?.message,
+              errorStr: String(err),
+            },
+            timestamp: Date.now(),
+            hypothesisId: "H5",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
+      // #region agent log
+      fetch(
+        "http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": "95efae",
+          },
+          body: JSON.stringify({
+            sessionId: "95efae",
+            location: "NewAssigmentModal.tsx:catch",
+            message: "mutation error caught",
+            data: {
+              errorMessage: (err as Error)?.message,
+              errorStr: String(err),
+              errorStack: (err as Error)?.stack,
+            },
+            timestamp: Date.now(),
+            hypothesisId: "H5",
+          }),
+        },
+      ).catch(() => {});
+      // #endregion
       console.error("Алдаа:", err);
       alert("Алдаа гарлаа. Та дахин оролдоно уу.");
     }
@@ -151,14 +317,18 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
       <div className="bg-white rounded-3xl w-full max-w-md shadow-xl overflow-hidden">
         {/* Header */}
         <div className="px-6 pt-6 pb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Шалгалт үүсгэх</h2>
-            <button
+          <h2 className="text-xl font-semibold text-gray-900">
+            Шалгалт үүсгэх
+          </h2>
+          <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600  text-2xl leading-none"
-          ></button>        </div>
+          ></button>{" "}
+        </div>
 
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
-          {/* Шалгалтын материал */} <div className="flex flex-wrap items-center gap-2 -mt-2 mb-2">
+          {/* Шалгалтын материал */}{" "}
+          <div className="flex flex-wrap items-center gap-2 -mt-2 mb-2">
             <button
               type="button"
               onClick={fillDemoFields}
@@ -169,7 +339,8 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
             <span className="text-xs text-gray-500">
               Нэр, огноо, эхлэх (+1 мин), дуусах (+1 цаг) автоматаар
             </span>
-          </div>                    <div>
+          </div>{" "}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Шалгалтын материал <span className="text-red-500">*</span>
             </label>
@@ -183,7 +354,9 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
               disabled={examsLoading}
             >
               <option value="">
-                {examsLoading ? "Уншиж байна..." : "Шалгалтын материалаа сонгоно уу"}
+                {examsLoading
+                  ? "Уншиж байна..."
+                  : "Шалгалтын материалаа сонгоно уу"}
               </option>
               {examsData?.exams?.map((exam) => (
                 <option key={exam.id} value={exam.id}>
@@ -192,7 +365,6 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
               ))}
             </select>
           </div>
-
           {/* Шалгалтын нэр */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -209,23 +381,19 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
               required
             />
           </div>
-
           {/* Огноо */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1.5">
-                Огноо
-              </label>
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) =>
-                  setFormData({ ...formData, date: e.target.value })
-                }
-                className="w-full border border-gray-300 rounded-2xl px-4 py-3 focus:outline-none focus:border-purple-500"
-                required
-              />
+            <label className="block text-sm text-gray-600 mb-1.5">Огноо</label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) =>
+                setFormData({ ...formData, date: e.target.value })
+              }
+              className="w-full border border-gray-300 rounded-2xl px-4 py-3 focus:outline-none focus:border-purple-500"
+              required
+            />
           </div>
-
           {/* Эхлэх / Дуусах цаг */}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -257,7 +425,6 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
               />
             </div>
           </div>
-
           {/* Анги */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -282,7 +449,6 @@ export default function NewAssignmentModal({ isOpen, onClose }: Props) {
               ))}
             </select>
           </div>
-
           {/* Buttons */}
           <div className="flex gap-3 pt-2">
             <button

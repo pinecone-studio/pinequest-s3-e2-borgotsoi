@@ -41,19 +41,37 @@ export const createExamSession: MutationResolvers["createExamSession"] = async (
     .from(usersTable)
     .where(eq(usersTable.id, input.creatorId))
     .limit(1);
-  if (!creator) throw new Error("Creator user not found");
+  if (!creator) {
+    throw new Error("Creator user not found");
+  }
 
-  const [created] = await db
-    .insert(examSessionsTable)
-    .values({
-      examId: input.examId,
-      classId: input.classId,
-      creatorId: input.creatorId,
-      description: input.description,
-      startTime: new Date(input.startTime).getTime(),
-      endTime: new Date(input.endTime).getTime(),
-    })
-    .returning();
+  // #region agent log
+  const _startParsed = new Date(input.startTime).getTime();
+  const _endParsed = new Date(input.endTime).getTime();
+  const _startEpoch = Math.floor(_startParsed / 1000);
+  const _endEpoch = Math.floor(_endParsed / 1000);
+  fetch('http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'95efae'},body:JSON.stringify({sessionId:'95efae',location:'examSession.ts:resolver',message:'resolver input & computed epochs',data:{inputStartTime:input.startTime,inputEndTime:input.endTime,inputStartTimeType:typeof input.startTime,inputEndTimeType:typeof input.endTime,startParsedMs:_startParsed,endParsedMs:_endParsed,startEpochSec:_startEpoch,endEpochSec:_endEpoch,startIsNaN:Number.isNaN(_startParsed),endIsNaN:Number.isNaN(_endParsed)},timestamp:Date.now(),hypothesisId:'H2,H3'})}).catch(()=>{});
+  // #endregion
+
+  let created;
+  try {
+    [created] = await db
+      .insert(examSessionsTable)
+      .values({
+        examId: input.examId,
+        classId: input.classId,
+        creatorId: input.creatorId,
+        description: input.description,
+        startTime: _startEpoch,
+        endTime: _endEpoch,
+      })
+      .returning();
+  } catch (_insertErr) {
+    // #region agent log
+    fetch('http://127.0.0.1:7898/ingest/430074f6-88ab-43e4-ab27-c5c75c4fee3b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'95efae'},body:JSON.stringify({sessionId:'95efae',location:'examSession.ts:insertCatch',message:'DB insert failed',data:{error:String(_insertErr),errorMessage:(_insertErr as Error)?.message},timestamp:Date.now(),hypothesisId:'H3,H5'})}).catch(()=>{});
+    // #endregion
+    throw _insertErr;
+  }
 
   if (!created) throw new Error("Exam session not created");
 
