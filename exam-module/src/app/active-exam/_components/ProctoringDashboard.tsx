@@ -11,23 +11,24 @@ export const ProctoringDashboard = ({
 }: ProctorProps) => {
   return (
     <div className="space-y-6">
-      {/* Video Container */}
-      <div className="relative aspect-video bg-slate-800 rounded-3xl overflow-hidden border-2 border-slate-700 shadow-2xl">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          className={`w-full h-full object-cover transition-opacity duration-700 ${isReady ? "opacity-100 grayscale" : "opacity-0"}`}
-        />
+      {/* Hidden capture element: stream + face detection need a real video node; students do not see a self-view */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        className="fixed left-[-9999px] top-0 h-[240px] w-[320px] opacity-0 pointer-events-none"
+        aria-hidden
+      />
 
-        {/* Speech Detection Indicator */}
+      {/* Speech Detection Indicator */}
+      <div className="relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-800/80 shadow-xl">
         {isReady && (
           <div
-            className={`absolute bottom-0 left-0 w-full flex items-center gap-2 px-3 py-2 backdrop-blur-md border-t transition-colors duration-300 ${
+            className={`flex items-center gap-2 px-3 py-3 backdrop-blur-md border-b transition-colors duration-300 ${
               isSpeechDetected
                 ? "bg-red-900/60 border-red-500/40"
-                : "bg-black/60 border-white/10"
+                : "bg-black/40 border-white/10"
             }`}
           >
             <span className="relative flex h-2.5 w-2.5">
@@ -51,8 +52,9 @@ export const ProctoringDashboard = ({
         )}
 
         {!isReady && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="flex items-center justify-center gap-3 px-3 py-8">
+            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin shrink-0" />
+            <span className="text-xs text-slate-400">Initializing sensors…</span>
           </div>
         )}
       </div>
