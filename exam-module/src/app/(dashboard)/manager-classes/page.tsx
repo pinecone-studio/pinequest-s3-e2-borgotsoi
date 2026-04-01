@@ -12,7 +12,6 @@ import { ChevronLeft, Users } from "lucide-react";
 import { CreateClassDialog } from "./_components/CreateClassDialog";
 import { ClassCard } from "./_components/ClassCardProps";
 import { StudentTable } from "./_components/StudentSection";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GroupCard } from "./_components/GroupCard";
 
 type Class = GetClassesQuery["getClasses"][number];

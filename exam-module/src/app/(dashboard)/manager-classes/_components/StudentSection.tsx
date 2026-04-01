@@ -12,7 +12,7 @@ import {
   GetStudentsByClasssQuery,
   useGetStudentsByClasssQuery,
 } from "@/gql/graphql";
-import { Loader2, MoreVertical, Pencil, Users } from "lucide-react";
+import { Loader2, MoreVertical, Pencil} from "lucide-react";
 import { AddStudentDialog } from "./AddStudentDialog";
 import { EditStudentDialog } from "./EditStudentDialog";
 import {

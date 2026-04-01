@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-// Генератлагдсан төрлүүдийг импортлох
 import {
   useUpdateStudentMutation,
   GetStudentsByClasssQuery,
@@ -17,14 +15,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useState } from "react";
 
-// Array-аас нэг сурагчийн төрлийг салгаж авах (Unwrap type)
 type StudentType = NonNullable<
   GetStudentsByClasssQuery["studentsByClass"]
 >[number];
 
 interface EditStudentProps {
-  student: StudentType | null; // Сонгогдоогүй үед null байна
+  student: StudentType | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -37,20 +35,10 @@ export function EditStudentDialog({
   onSuccess,
 }: EditStudentProps) {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: student?.name ?? "",
+    email: student?.email ?? "",
+    phone: student?.phone ?? "",
   });
-
-  useEffect(() => {
-    if (student) {
-      setFormData({
-        name: student.name || "",
-        email: student.email || "",
-        phone: student.phone || "",
-      });
-    }
-  }, [student]);
 
   const [updateStudent, { loading }] = useUpdateStudentMutation();
 
@@ -65,7 +53,6 @@ export function EditStudentDialog({
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          // Хэрэв classId заавал шаардлагатай бол student.classId-г дамжуулна
         },
       });
 
@@ -80,7 +67,10 @@ export function EditStudentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-[1.2rem]">
+      <DialogContent
+        key={student?.id ?? "new"}
+        className="sm:max-w-[425px] rounded-[1.2rem]"
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-slate-800">
             Сурагчийн мэдээлэл засах

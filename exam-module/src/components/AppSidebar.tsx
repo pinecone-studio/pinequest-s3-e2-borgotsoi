@@ -95,7 +95,7 @@ export function AppSidebar() {
       title: "Шалгалтын материал",
       icon: FolderOpen,
       path: "/materials",
-      roles: ["teacher"],
+      roles: ["teacher","manager"],
     },
     {
       title: "Ажилтнууд",
