@@ -45,6 +45,7 @@ export const sessionTypeDefs = `
 
   extend type Query {
     getSessionsByClass(classId: ID!): [ExamSession!]!
+    getSessionsByCreator(creatorId: ID!): [ExamSession!]!
     getActiveSessions: [ExamSession!]!
     examSession(id: ID!): ExamSession
     """

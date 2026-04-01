@@ -2,14 +2,14 @@
 
 export const runtime = "edge";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import TabButton from "./_components/TabButton";
 import AssignmentCard from "./_components/Assignment.Card";
 import NewAssignmentModal from "./_components/NewAssigmentModal";
 import ProgressTable from "./_components/Progresstable";
 import { tabs } from "./_components/mock";
 import {
-  useGetActiveSessionQuery,
+  useGetSessionsByCreatorQuery,
   useGetProctorLogsQuery,
 } from "@/gql/graphql";
 import {
@@ -18,6 +18,17 @@ import {
 } from "@/hooks/useProctorLogsPusher";
 import { ProctorVideoGrid } from "./_components/ProctorVideoGrid";
 
+function getCreatorIdFromStorage(): string | null {
+  try {
+    const raw = localStorage.getItem("user");
+    if (!raw) return null;
+    const user = JSON.parse(raw) as { id?: string };
+    return user.id && user.id.length > 0 ? user.id : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ShalgaltPage() {
   const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,24 +36,74 @@ export default function ShalgaltPage() {
   const [pickedViewerSessionId, setPickedViewerSessionId] = useState<
     string | null
   >(null);
+  const [creatorId, setCreatorId] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(false);
 
-  const { data, loading, error } = useGetActiveSessionQuery();
-  const { data: proctorData, loading: proctorLoading } = useGetProctorLogsQuery(
-    {
-      fetchPolicy: "cache-and-network",
-      pollInterval: 5000,
-    },
-  );
+  useEffect(() => {
+    queueMicrotask(() => {
+      setCreatorId(getCreatorIdFromStorage());
+      setAuthReady(true);
+    });
+  }, []);
+
+  const { data, loading, error } = useGetSessionsByCreatorQuery({
+    variables: { creatorId: creatorId! },
+    skip: !authReady || !creatorId,
+  });
 
   const sessions = useMemo(
-    () => data?.getActiveSessions ?? [],
-    [data?.getActiveSessions],
+    () => data?.getSessionsByCreator ?? [],
+    [data?.getSessionsByCreator],
+  );
+
+  const filteredAssignments = useMemo(() => {
+    const now = new Date();
+
+    const upcoming = sessions.filter((s) => {
+      const start = new Date(s.startTime);
+
+      return start > now;
+    });
+
+    const ongoing = sessions.filter((s) => {
+      const start = new Date(s.startTime);
+      const end = new Date(s.endTime);
+      return start <= now && end >= now;
+    });
+    const finished = sessions.filter((s) => {
+      const end = new Date(s.endTime);
+
+      return end < now;
+    });
+    return { upcoming, ongoing, finished };
+  }, [sessions]);
+
+  const effectiveViewerSessionId = useMemo(() => {
+    const ongoing = filteredAssignments.ongoing;
+    if (ongoing.length === 0) return null;
+    if (
+      pickedViewerSessionId &&
+      ongoing.some((s) => s.id === pickedViewerSessionId)
+    ) {
+      return pickedViewerSessionId;
+    }
+    return ongoing[0]!.id;
+  }, [filteredAssignments.ongoing, pickedViewerSessionId]);
+
+  const { data: proctorData, loading: proctorLoading } = useGetProctorLogsQuery(
+    {
+      variables: { sessionId: effectiveViewerSessionId ?? undefined },
+      fetchPolicy: "cache-and-network",
+      pollInterval: 5000,
+      skip: !effectiveViewerSessionId,
+    },
   );
 
   const seedLogs = useMemo(() => {
     const rows = proctorData?.proctorLogs ?? [];
     return rows.map((r) => ({
       id: r.id,
+      sessionId: r.sessionId ?? null,
       examId: r.examId ?? null,
       studentId: r.studentId ?? "",
       eventType: r.eventType,
@@ -52,21 +113,30 @@ export default function ShalgaltPage() {
   }, [proctorData?.proctorLogs]);
 
   const liveLogs = useMemo(() => {
+    if (!effectiveViewerSessionId) return [];
     const byId = new Map<string, ProctorLogPayload>();
-    for (const row of pusherLogs) byId.set(row.id, row);
-    for (const row of seedLogs) byId.set(row.id, row);
+    const inSession = (row: ProctorLogPayload) =>
+      row.sessionId === effectiveViewerSessionId;
+    for (const row of pusherLogs) {
+      if (inSession(row)) byId.set(row.id, row);
+    }
+    for (const row of seedLogs) {
+      if (inSession(row)) byId.set(row.id, row);
+    }
     return Array.from(byId.values()).sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-  }, [seedLogs, pusherLogs]);
+  }, [effectiveViewerSessionId, seedLogs, pusherLogs]);
 
   const onNewLog = useCallback((log: ProctorLogPayload) => {
     setPusherLogs((prev) => {
+      if (!effectiveViewerSessionId || log.sessionId !== effectiveViewerSessionId)
+        return prev;
       if (prev.some((p) => p.id === log.id)) return prev;
       return [...prev, log];
     });
-  }, []);
+  }, [effectiveViewerSessionId]);
 
   //shineer orson yms
   const formatLogTime = (dateString: string) =>
@@ -118,47 +188,6 @@ export default function ShalgaltPage() {
 
   useProctorLogsPusher(true, onNewLog);
 
-  const filteredAssignments = useMemo(() => {
-    const now = new Date();
-
-    const upcoming = sessions.filter((s) => {
-      const start = new Date(s.startTime);
-
-      return start > now;
-    });
-
-    const ongoing = sessions.filter((s) => {
-      const start = new Date(s.startTime);
-      const end = new Date(s.endTime);
-      return start <= now && end >= now;
-    });
-    const finished = sessions.filter((s) => {
-      const end = new Date(s.endTime);
-
-      return end < now;
-    });
-    return { upcoming, ongoing, finished };
-  }, [sessions]);
-
-  const ongoingExamIds = useMemo(() => {
-    const ids = filteredAssignments.ongoing
-      .map((s) => s.exam?.id)
-      .filter((id): id is string => Boolean(id));
-    return new Set(ids);
-  }, [filteredAssignments.ongoing]);
-
-  const effectiveViewerSessionId = useMemo(() => {
-    const ongoing = filteredAssignments.ongoing;
-    if (ongoing.length === 0) return null;
-    if (
-      pickedViewerSessionId &&
-      ongoing.some((s) => s.id === pickedViewerSessionId)
-    ) {
-      return pickedViewerSessionId;
-    }
-    return ongoing[0]!.id;
-  }, [filteredAssignments.ongoing, pickedViewerSessionId]);
-
   const viewerSession = useMemo(
     () =>
       filteredAssignments.ongoing.find(
@@ -167,19 +196,14 @@ export default function ShalgaltPage() {
     [filteredAssignments.ongoing, effectiveViewerSessionId],
   );
 
-  /**
-   * Prefer logs for current ongoing exams when we can resolve exam ids.
-   * If we cannot (no sessions, missing exam on session, or ID mismatch), show all live logs so Pusher still appears.
-   */
-  const ongoingLogs = useMemo(() => {
-    if (liveLogs.length === 0) return [];
-    if (ongoingExamIds.size === 0) return liveLogs;
-    const scoped = liveLogs.filter(
-      (log) => !log.examId || ongoingExamIds.has(log.examId),
+  if (!authReady)
+    return <div className="p-8 text-center text-gray-500">Уншиж байна...</div>;
+  if (!creatorId)
+    return (
+      <div className="p-8 text-center text-red-500 font-medium">
+        Хэрэглэгчийн мэдээлэл олдсонгүй. Дахин нэвтэрнэ үү.
+      </div>
     );
-    return scoped.length > 0 ? scoped : liveLogs;
-  }, [liveLogs, ongoingExamIds]);
-
   if (loading)
     return <div className="p-8 text-center text-gray-500">Уншиж байна...</div>;
   if (error)
@@ -399,14 +423,14 @@ export default function ShalgaltPage() {
                   </div>
 
                   <div className="space-y-3 overflow-y-auto xl:max-h-[calc(100%-92px)] pr-1">
-                    {ongoingLogs.length === 0 ? (
+                    {liveLogs.length === 0 ? (
                       <div className="rounded-[22px] border border-dashed border-gray-200 bg-white px-4 py-10 text-center text-sm text-gray-400">
                         {filteredAssignments.ongoing.length === 0
                           ? "Эхэлсэн шалгалт байхгүй."
                           : "Хяналтын бүртгэл олдсонгүй."}
                       </div>
                     ) : (
-                      ongoingLogs.map((row) => (
+                      liveLogs.map((row) => (
                         <div
                           key={row.id}
                           className="rounded-[22px] border border-[#F2B7BE] bg-[#FFF1F3] px-4 py-4"

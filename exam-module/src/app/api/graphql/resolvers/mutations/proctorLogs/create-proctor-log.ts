@@ -10,6 +10,7 @@ import { MutationResolvers } from "@/gql/graphql";
 
 type PusherBroadcastPayload = {
   id: string;
+  sessionId: string | null;
   examId: string | null;
   studentId: string | null;
   eventType: string;
@@ -131,6 +132,7 @@ export const createProctorLog: MutationResolvers["createProctorLog"] = async (
 
   const pusherPayload: PusherBroadcastPayload = {
     id: formattedLog.id,
+    sessionId: formattedLog.sessionId ?? null,
     examId: formattedLog.examId,
     studentId: formattedLog.studentId,
     eventType: formattedLog.eventType,
