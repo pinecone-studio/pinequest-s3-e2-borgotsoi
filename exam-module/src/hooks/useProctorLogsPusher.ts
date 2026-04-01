@@ -6,6 +6,7 @@ import { PUSHER_CHANNELS, PUSHER_EVENTS } from "@/lib/constants";
 
 export type ProctorLogPayload = {
   id: string;
+  sessionId: string | null;
   examId: string | null;
   studentId: string;
   eventType: string;
@@ -38,7 +39,12 @@ function normalizeProctorLogPayload(raw: unknown): ProctorLogPayload | null {
   const examIdRaw = v.examId;
   const examId =
     examIdRaw === null || examIdRaw === undefined ? null : String(examIdRaw);
-  return { id, examId, studentId, eventType, createdAt, updatedAt };
+  const sessionIdRaw = v.sessionId;
+  const sessionId =
+    sessionIdRaw === null || sessionIdRaw === undefined
+      ? null
+      : String(sessionIdRaw);
+  return { id, sessionId, examId, studentId, eventType, createdAt, updatedAt };
 }
 
 /**

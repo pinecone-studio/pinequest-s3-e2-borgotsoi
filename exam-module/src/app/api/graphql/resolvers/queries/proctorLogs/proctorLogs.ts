@@ -9,7 +9,7 @@ import { and, eq } from "drizzle-orm";
 
 export const proctorLogs: QueryResolvers["proctorLogs"] = async (
   _parent,
-  { examId, studentId },
+  { examId, studentId, sessionId },
   context,
 ) => {
   const db = getDb(context.db);
@@ -17,6 +17,7 @@ export const proctorLogs: QueryResolvers["proctorLogs"] = async (
   const conditions = [];
   if (examId) conditions.push(eq(examSessions.examId, examId));
   if (studentId) conditions.push(eq(proctorLogsTable.studentId, studentId));
+  if (sessionId) conditions.push(eq(proctorLogsTable.sessionId, sessionId));
 
   const base = db
     .select({

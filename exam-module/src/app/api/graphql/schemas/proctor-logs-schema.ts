@@ -11,7 +11,7 @@ export const proctorLogsTypeDefs = /* GraphQL */ `
   }
 
   extend type Query {
-    proctorLogs(examId: ID, studentId: ID): [ProctorLog!]!
+    proctorLogs(examId: ID, studentId: ID, sessionId: ID): [ProctorLog!]!
     proctorLog(id: ID!): ProctorLog
   }
 

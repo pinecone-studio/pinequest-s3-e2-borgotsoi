@@ -1,5 +1,5 @@
-query GetProctorLogs($examId: ID, $studentId: ID) {
-  proctorLogs(examId: $examId, studentId: $studentId) {
+query GetProctorLogs($examId: ID, $studentId: ID, $sessionId: ID) {
+  proctorLogs(examId: $examId, studentId: $studentId, sessionId: $sessionId) {
     id
     sessionId
     examId

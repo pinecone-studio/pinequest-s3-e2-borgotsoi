@@ -372,6 +372,7 @@ export type Query = {
   getActiveSessions: Array<ExamSession>;
   getClasses: Array<Class>;
   getSessionsByClass: Array<ExamSession>;
+  getSessionsByCreator: Array<ExamSession>;
   getStudents: Array<Student>;
   proctorLog?: Maybe<ProctorLog>;
   proctorLogs: Array<ProctorLog>;
@@ -428,6 +429,11 @@ export type QueryGetSessionsByClassArgs = {
 };
 
 
+export type QueryGetSessionsByCreatorArgs = {
+  creatorId: Scalars['ID']['input'];
+};
+
+
 export type QueryProctorLogArgs = {
   id: Scalars['ID']['input'];
 };
@@ -435,6 +441,7 @@ export type QueryProctorLogArgs = {
 
 export type QueryProctorLogsArgs = {
   examId?: InputMaybe<Scalars['ID']['input']>;
+  sessionId?: InputMaybe<Scalars['ID']['input']>;
   studentId?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -834,6 +841,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getActiveSessions?: Resolver<Array<ResolversTypes['ExamSession']>, ParentType, ContextType>;
   getClasses?: Resolver<Array<ResolversTypes['Class']>, ParentType, ContextType>;
   getSessionsByClass?: Resolver<Array<ResolversTypes['ExamSession']>, ParentType, ContextType, RequireFields<QueryGetSessionsByClassArgs, 'classId'>>;
+  getSessionsByCreator?: Resolver<Array<ResolversTypes['ExamSession']>, ParentType, ContextType, RequireFields<QueryGetSessionsByCreatorArgs, 'creatorId'>>;
   getStudents?: Resolver<Array<ResolversTypes['Student']>, ParentType, ContextType>;
   proctorLog?: Resolver<Maybe<ResolversTypes['ProctorLog']>, ParentType, ContextType, RequireFields<QueryProctorLogArgs, 'id'>>;
   proctorLogs?: Resolver<Array<ResolversTypes['ProctorLog']>, ParentType, ContextType, Partial<QueryProctorLogsArgs>>;
@@ -1051,10 +1059,18 @@ export type GetExamQuery = { __typename?: 'Query', exams: Array<{ __typename?: '
 export type GetProctorLogsQueryVariables = Exact<{
   examId?: InputMaybe<Scalars['ID']['input']>;
   studentId?: InputMaybe<Scalars['ID']['input']>;
+  sessionId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
 export type GetProctorLogsQuery = { __typename?: 'Query', proctorLogs: Array<{ __typename?: 'ProctorLog', id: string, sessionId?: string | null, examId?: string | null, studentId?: string | null, eventType: string, createdAt: string, updatedAt: string }> };
+
+export type GetSessionsByCreatorQueryVariables = Exact<{
+  creatorId: Scalars['ID']['input'];
+}>;
+
+
+export type GetSessionsByCreatorQuery = { __typename?: 'Query', getSessionsByCreator: Array<{ __typename?: 'ExamSession', classId: string, id: string, startTime: string, description: string, createdAt: string, endTime: string, updatedAt: string, status?: string | null, class?: { __typename?: 'Class', id: string, name: string } | null, exam?: { __typename?: 'Exam', id: string, name: string } | null }> };
 
 export type GetStudentsByClassQueryVariables = Exact<{
   classId: Scalars['ID']['input'];
@@ -1909,8 +1925,8 @@ export type GetExamLazyQueryHookResult = ReturnType<typeof useGetExamLazyQuery>;
 export type GetExamSuspenseQueryHookResult = ReturnType<typeof useGetExamSuspenseQuery>;
 export type GetExamQueryResult = Apollo.QueryResult<GetExamQuery, GetExamQueryVariables>;
 export const GetProctorLogsDocument = gql`
-    query GetProctorLogs($examId: ID, $studentId: ID) {
-  proctorLogs(examId: $examId, studentId: $studentId) {
+    query GetProctorLogs($examId: ID, $studentId: ID, $sessionId: ID) {
+  proctorLogs(examId: $examId, studentId: $studentId, sessionId: $sessionId) {
     id
     sessionId
     examId
@@ -1936,6 +1952,7 @@ export const GetProctorLogsDocument = gql`
  *   variables: {
  *      examId: // value for 'examId'
  *      studentId: // value for 'studentId'
+ *      sessionId: // value for 'sessionId'
  *   },
  * });
  */
@@ -1958,6 +1975,64 @@ export type GetProctorLogsQueryHookResult = ReturnType<typeof useGetProctorLogsQ
 export type GetProctorLogsLazyQueryHookResult = ReturnType<typeof useGetProctorLogsLazyQuery>;
 export type GetProctorLogsSuspenseQueryHookResult = ReturnType<typeof useGetProctorLogsSuspenseQuery>;
 export type GetProctorLogsQueryResult = Apollo.QueryResult<GetProctorLogsQuery, GetProctorLogsQueryVariables>;
+export const GetSessionsByCreatorDocument = gql`
+    query GetSessionsByCreator($creatorId: ID!) {
+  getSessionsByCreator(creatorId: $creatorId) {
+    classId
+    class {
+      id
+      name
+    }
+    exam {
+      id
+      name
+    }
+    id
+    startTime
+    description
+    createdAt
+    endTime
+    updatedAt
+    status
+  }
+}
+    `;
+
+/**
+ * __useGetSessionsByCreatorQuery__
+ *
+ * To run a query within a React component, call `useGetSessionsByCreatorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSessionsByCreatorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSessionsByCreatorQuery({
+ *   variables: {
+ *      creatorId: // value for 'creatorId'
+ *   },
+ * });
+ */
+export function useGetSessionsByCreatorQuery(baseOptions: Apollo.QueryHookOptions<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables> & ({ variables: GetSessionsByCreatorQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>(GetSessionsByCreatorDocument, options);
+      }
+export function useGetSessionsByCreatorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>(GetSessionsByCreatorDocument, options);
+        }
+// @ts-ignore
+export function useGetSessionsByCreatorSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>): Apollo.UseSuspenseQueryResult<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>;
+export function useGetSessionsByCreatorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>): Apollo.UseSuspenseQueryResult<GetSessionsByCreatorQuery | undefined, GetSessionsByCreatorQueryVariables>;
+export function useGetSessionsByCreatorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>(GetSessionsByCreatorDocument, options);
+        }
+export type GetSessionsByCreatorQueryHookResult = ReturnType<typeof useGetSessionsByCreatorQuery>;
+export type GetSessionsByCreatorLazyQueryHookResult = ReturnType<typeof useGetSessionsByCreatorLazyQuery>;
+export type GetSessionsByCreatorSuspenseQueryHookResult = ReturnType<typeof useGetSessionsByCreatorSuspenseQuery>;
+export type GetSessionsByCreatorQueryResult = Apollo.QueryResult<GetSessionsByCreatorQuery, GetSessionsByCreatorQueryVariables>;
 export const GetStudentsByClassDocument = gql`
     query GetStudentsByClass($classId: ID!) {
   studentsByClass(classId: $classId) {

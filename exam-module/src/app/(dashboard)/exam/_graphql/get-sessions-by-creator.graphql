@@ -1,0 +1,20 @@
+query GetSessionsByCreator($creatorId: ID!) {
+  getSessionsByCreator(creatorId: $creatorId) {
+    classId
+    class {
+      id
+      name
+    }
+    exam {
+      id
+      name
+    }
+    id
+    startTime
+    description
+    createdAt
+    endTime
+    updatedAt
+    status
+  }
+}

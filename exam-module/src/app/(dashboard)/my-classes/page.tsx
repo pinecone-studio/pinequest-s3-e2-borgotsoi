@@ -1,17 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
-import { useGetClassesQuery, useGetStudentsQuery } from "@/gql/graphql";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  useGetClassesQuery,
+  useGetStudentsQuery,
+  UserRole,
+} from "@/gql/graphql";
 import { Plus } from "lucide-react";
 import { ClassCard } from "./_components/ClassCard";
 import { AddClassModal } from "./_components/Addclass";
 
+type StoredUser = {
+  role?: UserRole | string;
+  classIds?: string[];
+};
+
 export default function ClassesPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [storedUser, setStoredUser] = useState<StoredUser | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const { data, loading, error } = useGetClassesQuery();
   const { data: studentData } = useGetStudentsQuery();
 
-  if (loading)
+  useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        const raw = localStorage.getItem("user");
+        setStoredUser(raw ? (JSON.parse(raw) as StoredUser) : null);
+      } catch {
+        setStoredUser(null);
+      }
+      setAuthReady(true);
+    });
+  }, []);
+
+  const classes = useMemo(() => {
+    const all = data?.getClasses ?? [];
+    if (storedUser?.role !== UserRole.Teacher) return [];
+    const allowed = new Set(storedUser.classIds ?? []);
+    return all.filter((c) => allowed.has(c.id));
+  }, [data?.getClasses, storedUser]);
+
+  if (loading || !authReady)
     return (
       <div className="flex items-center justify-center h-screen ml-64">
         Уншиж байна...
@@ -24,8 +54,6 @@ export default function ClassesPage() {
         Алдаа гарлаа: {error.message}
       </div>
     );
-
-  const classes = data?.getClasses || [];
   const students = studentData?.getStudents || [];
 
   const getStudentCount = (classId: string) =>
