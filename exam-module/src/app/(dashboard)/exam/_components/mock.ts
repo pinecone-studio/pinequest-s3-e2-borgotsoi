@@ -19,7 +19,7 @@ export interface Student {
   score: string;
 }
 
-export const tabs = ["Эхэлсэн ", "Авах ", "Дууссан шалгалтууд"] as const;
+export const tabs = ["Эхэлсэн ", "Авах шалгалтууд", "Дууссан "] as const;
 
 export const mockAssignments: AssignmentState = {
   upcoming: [
