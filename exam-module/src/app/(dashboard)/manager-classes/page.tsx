@@ -12,7 +12,6 @@ import { ChevronLeft, Users } from "lucide-react";
 import { CreateClassDialog } from "./_components/CreateClassDialog";
 import { ClassCard } from "./_components/ClassCardProps";
 import { StudentTable } from "./_components/StudentSection";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GroupCard } from "./_components/GroupCard";
 
 type Class = GetClassesQuery["getClasses"][number];
@@ -81,7 +80,9 @@ export default function ClassesPage() {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h1 className="text-3xl font-semibold text-gray-900">Анги</h1>
-                <p className="text-[14px] font-medium text-gray-400">Сургуульд анги, сурагч нэмэх</p>
+                <p className="text-[14px] font-medium text-gray-400">
+                  Сургуульд анги, сурагч нэмэх
+                </p>
               </div>
 
               <CreateClassDialog onSuccess={refetch} />
@@ -124,9 +125,10 @@ export default function ClassesPage() {
               {selectedGrade} бүлгүүд
             </h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {groupedByGrade[selectedGrade].map((cls) => (
+            <div className="grid grid-cols-4 gap-6">
+              {groupedByGrade[selectedGrade].map((cls, index) => (
                 <GroupCard
+                  color={cardColors[index % cardColors.length]}
                   key={cls.id}
                   cls={cls}
                   onClick={() => {
