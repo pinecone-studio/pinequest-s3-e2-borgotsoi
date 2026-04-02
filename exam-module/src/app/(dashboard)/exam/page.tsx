@@ -416,10 +416,10 @@ export default function ShalgaltPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <div className=" mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div className=" mx-auto ">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between  gap-4 mb-10">
           <div>
-            <h1 className="text-3xl font-semibold text-gray-900">Шалгалт</h1>
+            <h1 className="text-[24px] font-semibold text-gray-900">Шалгалт</h1>
             <p className="text-gray-600 mt-1">
               Шалгалттай холбоотой мэдээлэл болон шалгалт үүсгэх
             </p>
@@ -427,7 +427,7 @@ export default function ShalgaltPage() {
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-[#65558F] hover:bg-[#65558F]/90 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-all"
+            className="bg-[#21005D] hover:bg-[#21005D]/90 text-white px-6 py-4 rounded-full font-medium flex items-center gap-2 transition-all"
           >
             + Шалгалт үүсгэх
           </button>
