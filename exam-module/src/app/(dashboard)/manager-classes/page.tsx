@@ -73,14 +73,16 @@ export default function ClassesPage() {
     return <div className="p-10 text-center">Уншиж байна...</div>;
 
   return (
-    <div className="p-6 min-h-screen">
+    <div className="p-6 px-10 min-h-screen">
       <div className=" mx-auto">
         {view === "grid" && (
           <>
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-10">
               <div>
-                <h1 className="text-3xl font-semibold text-gray-900">Анги</h1>
-                <p className="text-[14px] font-medium text-gray-400">
+                <h1 className="text-[24px] font-semibold text-gray-900">
+                  Анги
+                </h1>
+                <p className="text-[14px] font-medium text-[#666666]">
                   Сургуульд анги, сурагч нэмэх
                 </p>
               </div>
@@ -125,7 +127,7 @@ export default function ClassesPage() {
               {selectedGrade} бүлгүүд
             </h1>
 
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-4 gap-5">
               {groupedByGrade[selectedGrade].map((cls, index) => (
                 <GroupCard
                   color={cardColors[index % cardColors.length]}
@@ -152,20 +154,9 @@ export default function ClassesPage() {
                 >
                   <ChevronLeft className="w-4 h-4" /> Бүлгүүд рүү буцах
                 </Button>
-                <h1 className="text-3xl font-black text-slate-900">
+                <h1 className="text-[24px] font-semibold text-slate-900">
                   {selectedGroup.name}
                 </h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <p className="text-sm font-medium text-slate-500">
-                    Анги удирдсан багш:{" "}
-                    <span className="text-slate-900">
-                      {classTeacher
-                        ? `${classTeacher.lastName} ${classTeacher.name}`
-                        : "Томилоогүй"}
-                    </span>
-                  </p>
-                </div>
               </div>
             </div>
             <StudentTable classId={selectedGroup.id} />

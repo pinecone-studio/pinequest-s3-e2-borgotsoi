@@ -27,18 +27,15 @@ export function GroupCard({ cls, onClick, color }: GroupCardProps) {
   return (
     <div
       onClick={onClick}
-      className="group bg-white border border-slate-300 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
+      className="group bg-white border h-[192px] border-slate-300 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
     >
       <div
-        className={`p-6 h-38 ${color} transition-opacity group-hover:opacity-90 relative`}
+        className={`p-6 h-30 ${color} transition-opacity group-hover:opacity-90 relative`}
       >
         <div className="flex items-center gap-3">
-          <h3 className="text-xl font-bold text-slate-800">{cls.name}</h3>
-          <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full">
-            <span className="text-[12px] font-semibold text-slate-600">
-              {count} сурагч
-            </span>
-          </div>
+          <h3 className="text-[18px] font-semibold text-slate-800">
+            {cls.name}
+          </h3>
         </div>
       </div>
 

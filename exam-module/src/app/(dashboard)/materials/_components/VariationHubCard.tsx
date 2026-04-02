@@ -24,13 +24,13 @@ export default function VariationHubCard({
 }: VariationHubCardProps) {
   return (
     <div className="relative w-full max-w-[280px] aspect-[1.45/1] group">
-      <div className="pointer-events-none absolute inset-0 flex flex-col justify-end rounded-[20px] overflow-hidden border border-[#B0C4DE] bg-[#E0E7FF] shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+      <div className="pointer-events-none absolute inset-0 flex flex-col  justify-end rounded-[20px] overflow-hidden border border-[#B0C4DE] bg-[#E0E7FF] shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
         <div
           className="absolute inset-0 bg-[#E0E7FF]"
           style={{ clipPath: folderClip }}
         />
         <div className="relative z-[1] flex flex-1 flex-col items-center justify-center px-4 pb-10 pt-6">
-          <div className="rounded-lg border border-[#B0C4DE] bg-white px-4 py-2 shadow-sm">
+          <div className="rounded-full border border-[#B0C4DE] bg-white px-4 py-1 shadow-sm">
             <span className="text-sm font-medium text-gray-900">
               Вариант {label}
             </span>

@@ -106,35 +106,33 @@ export function CreateClassDialog({ onSuccess }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-[#1a065e] hover:bg-[#2a0a8e] text-white rounded-[24px] gap-2 h-11 px-6">
+        <Button className="bg-[#21005D]   text-white rounded-full gap-2 h-11 px-6">
           <Plus className="w-5 h-5" /> Анги нэмэх
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] rounded-[2rem] p-8 border-none">
+      <DialogContent className="sm:max-w-[458px] bg-gray-50 rounded-[2rem] p-8 border-none">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-slate-900 pb-4">
+          <DialogTitle className="text-[20px]  font-semibold text-black pb-4">
             Анги үүсгэх
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-2">
           <div className="grid gap-2">
-            <Label className="text-sm font-medium">
-              Ангийн нэр (Жишээ: 11)*
-            </Label>
+            <Label className="text-[14px] font-medium ">Ангийн нэр *</Label>
             <Input
               placeholder="Анги оруулна уу"
               value={grade}
               onChange={(e) => setGrade(e.target.value)}
-              className="h-12 rounded-xl bg-slate-50/50"
+              className="h-[36px] rounded-xl bg-white"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label className="text-sm font-medium">Бүлэг сонгох*</Label>
+            <div className="grid  gap-2">
+              <Label className="text-[14px]  font-medium ">Бүлэг сонгох*</Label>
               <Select onValueChange={setGroup} value={group}>
-                <SelectTrigger className="h-12 rounded-xl bg-slate-50/50">
+                <SelectTrigger className="h-[36px] rounded-xl bg-white">
                   <SelectValue placeholder="Сонгох" />
                 </SelectTrigger>
                 <SelectContent>
@@ -148,25 +146,27 @@ export function CreateClassDialog({ onSuccess }: Props) {
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-sm font-medium text-slate-400">
+              <Label className="text-[14px] font-medium  text-slate-400">
                 Тоот (Заавал биш)
               </Label>
               <Input
                 placeholder="124"
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
-                className="h-12 rounded-xl bg-slate-50/50 border-slate-200"
+                className="h-[36px] rounded-xl bg-white border-slate-200"
               />
             </div>
           </div>
 
           <div className="grid gap-2">
-            <Label className="text-sm font-medium">Анги удирдсан багш*</Label>
+            <Label className="text-[14px] font-medium ">
+              Анги удирдсан багш*
+            </Label>
             <Select
               onValueChange={setSelectedTeacherId}
               value={selectedTeacherId}
             >
-              <SelectTrigger className="h-12 rounded-xl bg-slate-50/50">
+              <SelectTrigger className="h-[36px] rounded-xl bg-white">
                 <SelectValue placeholder="Багшийг сонгоно уу" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +180,7 @@ export function CreateClassDialog({ onSuccess }: Props) {
           </div>
         </div>
 
-        <DialogFooter className="flex bg-white flex-row justify-between items-center w-full pt-6">
+        <DialogFooter className="flex ml-8 bg-gray-50 flex-row justify-between items-center w-full pt-6">
           <Button
             variant="ghost"
             onClick={() => setOpen(false)}
@@ -189,7 +189,7 @@ export function CreateClassDialog({ onSuccess }: Props) {
             Буцах
           </Button>
           <Button
-            className="bg-[#1a065e] hover:bg-[#2a0a8e] text-white rounded-full px-10 h-12 font-semibold transition-all active:scale-95"
+            className="bg-[#21005D]   text-white rounded-full px-8 h-12 font-semibold transition-all "
             onClick={handleCreate}
             disabled={!isValid}
           >

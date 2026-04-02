@@ -62,9 +62,9 @@ export function AddStudentDialog({ classId, onSuccess }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-[#1A064E] hover:bg-[#250b6b] text-white rounded-full py-6 px-6 gap-2 shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
+        <Button className="bg-[#21005D]  rounded-full py-5 px-3 gap-2 shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
           <UserPlus className="w-5 h-5" />
-          <span className="font-bold text-[15px]">Сурагч нэмэх</span>
+          <span className="font-medium text-[14px]">Сурагч нэмэх</span>
         </Button>
       </DialogTrigger>
 
@@ -135,7 +135,6 @@ export function AddStudentDialog({ classId, onSuccess }: Props) {
           </div>
         </div>
 
-    
         <div className="flex items-center justify-end gap-6 mt-8">
           <button
             onClick={() => setOpen(false)}
