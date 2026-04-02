@@ -61,7 +61,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="flex h-18 items-center bg-[#F3F3F8] px-4 sm:px-8 sticky top-0 z-10 w-full">
+    <header className="flex h-[48px] items-center bg-[#F3F3F8] px-4 sm:px-8 sticky top-0 z-10 w-full">
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3"></div>
 
@@ -76,14 +76,6 @@ export default function Navbar() {
               </span>
               <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-white" />
             </div>
-            <div className="hidden sm:flex flex-col items-start">
-              <span className="text-sm font-semibold text-[#16033D]">
-                {fullName || "Хэрэглэгч"}
-              </span>
-            </div>
-            <ChevronDown
-              className={`h-4 w-4 text-[#16033D] transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
-            />
           </button>
 
           {dropdownOpen && (

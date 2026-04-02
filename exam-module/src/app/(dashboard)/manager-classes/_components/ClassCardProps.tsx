@@ -11,13 +11,13 @@ export function ClassCard({
   color: string;
 }) {
   return (
-    <Card className="group  overflow-hidden border-none shadow-sm cursor-pointer hover:shadow-md transition-all p-0 rounded-xl bg-white">
-      <div className={`h-38 ${color} p-6 flex flex-col justify-between `}>
+    <Card className="group h-[192px]  overflow-hidden border-none shadow-sm cursor-pointer hover:shadow-md transition-all p-0 rounded-xl bg-white">
+      <div className={`h-80 ${color} p-6 flex flex-col justify-between `}>
         <div className="flex justify-between items-start">
-          <h3 className="font-black text-2xl text-slate-800 tracking-tighter">
+          <h3 className="font-semibold text-[18px] text-black tracking-tighter">
             {grade}
           </h3>
-          <span className="bg-white/80 backdrop-blur-sm text-[11px] px-3 py-1 rounded-full font-bold text-slate-600 shadow-sm">
+          <span className="bg-white/80 backdrop-blur-sm text-[12px] px-3 py-1 rounded-full font-bold text-dark  shadow-sm">
             {count} бүлэг
           </span>
         </div>

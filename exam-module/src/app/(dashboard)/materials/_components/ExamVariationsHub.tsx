@@ -316,7 +316,7 @@ export default function ExamVariationsHub({
       )}
 
       <div className="mb-8">
-        <div className="group relative mx-auto w-full max-w-[283px] h-[173px] flex flex-col justify-end sm:mx-0">
+        <div className="group relative mx-auto w-full max-w-[223px] h-[163px] flex flex-col justify-end sm:mx-0">
           <div className="absolute inset-0 flex justify-center items-start pt-4">
             <FileSheet className="-rotate-15 -translate-x-[52%] -translate-y-2 opacity-90" />
             <FileSheet className="rotate-15 translate-x-[52%] -translate-y-2 opacity-90" />
@@ -401,7 +401,7 @@ export default function ExamVariationsHub({
             </p>
           </div>
 
-          <div className="grid grid-cols-5 ">
+          <div className="grid grid-cols-5 gap-5 ">
             <button
               type="button"
               disabled={duplicateDisabled}
@@ -432,7 +432,7 @@ export default function ExamVariationsHub({
                   )}
                 </div>
               </div>
-              <div className="absolute bottom-4 inset-x-4 rounded-lg border border-[#B0C4DE] bg-white px-3 py-2 text-center shadow-sm">
+              <div className="absolute bottom-4 inset-x-4 rounded-full border border-[#B0C4DE] bg-white px-3 py-1 text-center shadow-sm">
                 <span className="text-sm font-medium text-gray-900">
                   {dupLoadingLabel === duplicateSourceLabel
                     ? "Үүсгэж байна…"

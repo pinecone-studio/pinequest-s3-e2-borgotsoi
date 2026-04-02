@@ -95,7 +95,7 @@ export function AppSidebar() {
       title: "Шалгалтын материал",
       icon: FolderOpen,
       path: "/materials",
-      roles: ["teacher","manager"],
+      roles: ["teacher", "manager"],
     },
     {
       title: "Ажилтнууд",
@@ -142,7 +142,7 @@ export function AppSidebar() {
             />
             <span
               className={cn(
-                "flex-1 font-medium text-[16px] transition-colors",
+                "flex-1 font-medium text-[14px] transition-colors",
                 isActive
                   ? "text-[#16033D]"
                   : "text-[#16033D]/70 group-hover:text-[#16033D",
@@ -156,7 +156,7 @@ export function AppSidebar() {
     });
 
   return (
-    <Sidebar className="border-none w-[280px] ">
+    <Sidebar className="border-none w-[238px] ">
       <SidebarHeader className="p-8 bg-[#F3F3F8]">
         <div className="flex items-center gap-3 px-2">
           <div className="h-9 w-9 rounded-full border-2  flex items-center justify-center bg-white">

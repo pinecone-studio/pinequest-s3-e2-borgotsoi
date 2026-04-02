@@ -2,7 +2,6 @@
 
 import { Material } from "./mock";
 
-
 function FileSheet({ className }: { className?: string }) {
   return (
     <div
@@ -58,9 +57,9 @@ export default function MaterialCard({ material, onClick }: MaterialCardProps) {
           />
         </svg>
 
-        <div className="absolute bottom-5 inset-x-4">
-          <div className="w-full rounded-xl border border-[#B0C4DE] bg-white/95 py-2 px-4 shadow-sm">
-            <span className="text-[14px] font-medium text-gray-800 truncate block text-center">
+        <div className="absolute bottom-3 inset-x-4">
+          <div className="w-full rounded-xl  border border-[#B0C4DE] bg-white/95 py-1 px-4 shadow-sm">
+            <span className="text-[14px] font-medium text-black  block text-center">
               {material.title}
             </span>
           </div>

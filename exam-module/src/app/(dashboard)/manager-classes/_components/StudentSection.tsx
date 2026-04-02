@@ -12,7 +12,7 @@ import {
   GetStudentsByClasssQuery,
   useGetStudentsByClasssQuery,
 } from "@/gql/graphql";
-import { Loader2, MoreVertical, Pencil} from "lucide-react";
+import { Loader2, MoreVertical, Pencil } from "lucide-react";
 import { AddStudentDialog } from "./AddStudentDialog";
 import { EditStudentDialog } from "./EditStudentDialog";
 import {
@@ -49,37 +49,37 @@ export function StudentTable({ classId }: { classId: string }) {
     <div className="w-full space-y-4">
       <div className="flex justify-between items-center px-1">
         <div className="flex items-center gap-2">
-          <span className="text-[17px] font-bold text-slate-800">
+          <span className="text-[14px] font-meium text-black">
             Нийт сурагч:
           </span>
-          <span className="text-[17px] font-medium text-slate-500">
+          <span className="text-[14px] font-medium text-black">
             {students.length}
           </span>
         </div>
         <AddStudentDialog classId={classId} onSuccess={refetch} />
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-[1.2rem] shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-250px)]">
+      <div className="bg-white border border-slate-200 mt-4 rounded-xl overflow-hidden flex flex-col max-h-[calc(100vh-250px)]">
         <div className="overflow-y-auto custom-scrollbar">
           <Table>
             <TableHeader className="sticky top-0 bg-gray-100 z-10">
               <TableRow className="hover:bg-transparent border-b border-slate-200">
-                <TableHead className="w-16 text-center font-bold text-slate-800 h-16 text-[16px]">
+                <TableHead className="w-16 text-center font-medium text-slate-800 h-16 text-[16px]">
                   №
                 </TableHead>
-                <TableHead className="text-[#5D57D9] font-bold h-16 text-[16px]">
+                <TableHead className="text-[#5D57D9] font-medium h-16 text-[14px]">
                   Овог
                 </TableHead>
-                <TableHead className="text-[#5D57D9] font-bold h-16 text-[16px]">
+                <TableHead className="text-[#5D57D9] font-medium h-16 text-[14px]">
                   Нэр
                 </TableHead>
-                <TableHead className="text-[#5D57D9] font-bold h-16 text-[16px]">
+                <TableHead className="text-[#5D57D9] font-medium h-16 text-[14px]">
                   Регистрийн дугаар
                 </TableHead>
-                <TableHead className="text-[#5D57D9] font-bold h-16 text-[16px]">
+                <TableHead className="text-[#5D57D9] font-medium h-16 text-[14px]">
                   Мэйл хаяг
                 </TableHead>
-                <TableHead className="text-[#5D57D9] font-bold h-16 text-[16px]">
+                <TableHead className="text-[#5D57D9] font-medium h-16 text-[14px]">
                   Утас
                 </TableHead>
                 <TableHead className="w-12 h-16"></TableHead>
@@ -105,19 +105,19 @@ export function StudentTable({ classId }: { classId: string }) {
                     <TableCell className="text-center text-slate-600 py-5 text-[16px] font-medium">
                       {index + 1}
                     </TableCell>
-                    <TableCell className="text-slate-500 py-5 text-[16px] font-medium">
+                    <TableCell className="text-black py-5 text-[14px] font-medium">
                       Сурагчийн овог
                     </TableCell>
-                    <TableCell className="text-slate-900 py-5 text-[16px] font-medium">
+                    <TableCell className="text-slate-900 py-5 text-[14px] font-medium">
                       {student.name}
                     </TableCell>
-                    <TableCell className="text-slate-500 py-5 text-[16px] font-medium uppercase">
+                    <TableCell className="text-black py-5 text-[14px] font-medium uppercase">
                       АБ 00000000
                     </TableCell>
-                    <TableCell className="text-slate-500 py-5 text-[16px] font-medium">
+                    <TableCell className="text-black py-5 text-[14px] font-medium">
                       {student.email || "—"}
                     </TableCell>
-                    <TableCell className="text-slate-500 py-5 text-[16px] font-medium">
+                    <TableCell className="text-black py-5 text-[14px] font-medium">
                       {student.phone || "—"}
                     </TableCell>
                     <TableCell className="py-5 text-center pr-4">

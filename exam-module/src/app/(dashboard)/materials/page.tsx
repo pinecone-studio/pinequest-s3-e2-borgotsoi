@@ -12,8 +12,7 @@ import ExamVariationsHub from "./_components/ExamVariationsHub";
 import { formatExamCardDate, gradientForExamId } from "./_components/mock";
 import MaterialCard from "./_components/Materialcard";
 import AddCard from "./_components/Addcard";
-import { Search } from "lucide-react";
-
+import { ChevronDown, Search } from "lucide-react";
 
 export default function MaterialsPage() {
   const router = useRouter();
@@ -58,7 +57,6 @@ export default function MaterialsPage() {
         if (showFilters) {
           if (subjectId && exam.subjectId !== subjectId) return false;
           if (topicId && exam.topicId !== topicId) return false;
-          
         }
 
         return true;
@@ -72,26 +70,28 @@ export default function MaterialsPage() {
   }, [data?.exams, activeTab, materialSearch, subjectId, topicId, showFilters]);
 
   return (
-    <div className="bg-white p-6 min-h-screen">
+    <div className="bg-white p-6 px-10 min-h-screen">
       {!selectedExamId && (
         <div className="mb-8">
-          <h1 className="mb-1 text-3xl font-bold text-gray-900">
+          <h1 className=" text-[24px] font-bold text-gray-900">
             Шалгалтын материал
           </h1>
 
-          <p className="mb-6 text-sm text-gray-500">
+          <p className="mb-10 text-[#666666] text-[14px]  font-medium ">
             Шалгалтын материал үүсгэн ангиудад хуваарилах
           </p>
 
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between  pb-4">
             <div className="flex gap-8">
               <button
                 onClick={() => {
                   setActiveTab("mine");
                   setSelectedExamId(null);
                 }}
-                className={`pb-2 text-sm font-semibold relative ${
-                  activeTab === "mine" ? "text-[#5136a8]" : "text-gray-400"
+                className={`pb-2  text-[14px] font-medium = relative ${
+                  activeTab === "mine"
+                    ? "text-[#5136a8] border-b border-[#21005D]"
+                    : "text-gray-400"
                 }`}
               >
                 Миний материалууд
@@ -102,52 +102,54 @@ export default function MaterialsPage() {
                   setActiveTab("bank");
                   setSelectedExamId(null);
                 }}
-                className={`pb-2 text-sm font-semibold relative ${
-                  activeTab === "bank" ? "text-[#5136a8]" : "text-gray-400"
+                className={`pb-2 text-[14px] font-medium relative ${
+                  activeTab === "bank"
+                    ? "text-[#5136a8] border-b border-[#21005D]"
+                    : "text-gray-400"
                 }`}
               >
                 Шалгалтын сан
               </button>
             </div>
 
-            <div className="relative w-full max-w-md">
+            <div className="relative w-[285px] overflow-hidden overflow-x-auto">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 size-4" />
               <input
                 type="search"
                 value={materialSearch}
                 onChange={(e) => setMaterialSearch(e.target.value)}
                 placeholder="Материалын нэрээр хайх..."
-                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2.5 pl-11 pr-4 text-sm outline-none focus:bg-white"
+                className="w-full rounded-full border border-gray-200 bg-gray-50/50 py-2.5 pl-11 pr-4 text-sm outline-none focus:bg-white"
               />
             </div>
           </div>
 
           {showFilters && (
-            <div className="flex flex-wrap gap-4 mt-6">
-              <div className="relative w-full sm:w-64">
+            <div className="flex items-center gap-4 mt-10">
+              <div className="relative w-[222px]">
                 <select
                   value={subjectId}
                   onChange={(e) => {
                     setSubjectId(e.target.value);
                     setTopicId("");
                   }}
-                  className="w-full h-11 px-4 border rounded-xl text-sm"
+                  className="w-full h-[36px] px-4 bg-white border border-slate-200 rounded-xl text-sm appearance-none focus:ring-2 focus:ring-indigo-500/20 outline-none font-medium"
                 >
-                  <option value="">Бүх хичээл</option>
+                  <option value="">Хичээл сонгох</option>
                   {optionsData?.subjects?.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
                     </option>
                   ))}
                 </select>
+                <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
               </div>
-
-              <div className="relative w-full sm:w-64">
+              <div className="relative w-[222px]">
                 <select
                   value={topicId}
                   onChange={(e) => setTopicId(e.target.value)}
                   disabled={!subjectId}
-                  className="w-full h-11 px-4 border rounded-xl text-sm"
+                  className="w-full h-[36px] px-4 bg-white border border-slate-200 rounded-xl text-sm appearance-none focus:ring-2 focus:ring-indigo-500/20 outline-none font-medium text-slate-600 disabled:bg-slate-50 disabled:cursor-not-allowed"
                 >
                   <option value="">
                     {subjectId ? "Бүх сэдэв" : "Эхлээд хичээл сонгоно"}
@@ -158,6 +160,7 @@ export default function MaterialsPage() {
                     </option>
                   ))}
                 </select>
+                <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
               </div>
             </div>
           )}
@@ -182,7 +185,7 @@ export default function MaterialsPage() {
               onMaterialsTabChange={setActiveTab}
             />
           ) : (
-            <div className="grid grid-cols-5 gap-10">
+            <div className="grid grid-cols-5 gap-5">
               {activeTab === "mine" && !materialSearch && !subjectId && (
                 <AddCard onClick={() => router.push("/materials/create")} />
               )}
