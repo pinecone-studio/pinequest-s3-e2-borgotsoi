@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -11,7 +10,7 @@ interface QuestionFormProps {
   onChange: (updated: Question) => void;
   onDelete?: () => void;
   onDuplicate?: () => void;
-  addQuestion?:()=>void;
+  addQuestion?: () => void;
   showVariation?: boolean;
   index: number;
 }
@@ -106,18 +105,20 @@ export default function QuestionForm({
 
   const fileLabel = question.attachmentFile?.name ?? null;
   return (
-    <div className="bg-[#F8F9FD] border border-gray-100 rounded-[32px] p-8 mb-6 relative shadow-sm transition-all hover:shadow-md">
+    <div className="bg-[#F8FAFC] border border-gray-100 border-l-6 border-l-[#E1DFF9] rounded-xl p-8 mb-6 relative shadow-sm transition-all hover:shadow-md">
       <div className="flex items-center justify-between mb-6 border-b border-gray-200/60 pb-5">
         <div className="flex items-center gap-4 flex-1">
-          <span className="text-gray-900 font-bold text-xl">
-            <span className="text-gray-900 font-bold text-xl">{index}.</span>
+          <span className="text-gray-900 font-medium text-xl">
+            <span className="text-gray-900 font-medium text-[16px]">
+              {index}.
+            </span>
           </span>
-          <div className="relative flex-1 group max-w-6xl">
+          <div className="relative flex-1 group max-w-3xl">
             <input
               value={question.text}
               onChange={(e) => onChange({ ...question, text: e.target.value })}
               placeholder="Асуултаа оруулна уу"
-              className="w-full bg-transparent outline-none text-gray-800 text-lg font-medium placeholder:text-gray-400 border-b border-transparent focus:border-indigo-400 pb-1 transition-all"
+              className="w-full bg-transparent outline-none text-black text-[16px] font-medium placeholder:text-gray-400 border-b border-transparent focus:border-indigo-400 pb-1 transition-all"
             />
             <Pencil className="absolute -right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-hover:text-gray-600" />
           </div>
@@ -176,13 +177,12 @@ export default function QuestionForm({
             <div
               key={i}
               onClick={() => onChange({ ...question, correctIndex: i })}
-              className={`flex items-center justify-between p-4 px-6 rounded-full border-2 transition-all cursor-pointer bg-white group ${
+              className={`flex items-center justify-between py-2 px-6 rounded-full border-2 transition-all cursor-pointer bg-white group ${
                 isSelected
-                  ? "border-indigo-500 bg-indigo-50/30"
+                  ? "border-indigo-500 bg-[#E1DFF9]"
                   : "border-gray-100 hover:border-gray-200"
               }`}
             >
-             
               <div className="flex items-center gap-3 flex-1 overflow-hidden">
                 <span
                   className={`font-bold text-base transition-colors ${isSelected ? "text-indigo-600" : "text-gray-400"}`}
@@ -197,12 +197,12 @@ export default function QuestionForm({
                     onChange({ ...question, answers: newAnswers });
                   }}
                   placeholder="Хариулт"
-                  className="bg-transparent outline-none text-gray-700 text-base w-full font-medium"
+                  className="bg-transparent outline-none text-gray-700 text-[14px] text-base w-full font-medium"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
               <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                className={`w-6 h-6 rounded-full border-2 flex items-center   justify-center shrink-0 transition-all ${
                   isSelected
                     ? "border-indigo-600 bg-indigo-900"
                     : "border-gray-300"
@@ -245,7 +245,7 @@ export default function QuestionForm({
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200/60">
+      <div className="flex items-center justify-between  border-t border-gray-200/60">
         <div className="flex items-center gap-3">
           <label className="p-3 text-gray-400 hover:bg-white hover:text-indigo-600 hover:shadow-md rounded-2xl transition-all cursor-pointer">
             <ImageIcon className="w-6 h-6" />
@@ -264,18 +264,6 @@ export default function QuestionForm({
               }}
             />
           </label>
-          <button
-            onClick={onDelete}
-            className="p-3 text-gray-400 hover:text-red-500 hover:bg-white hover:shadow-md rounded-2xl transition-all"
-          >
-            <Trash2 className="w-6 h-6" />
-          </button>
-          <button
-            onClick={onDuplicate}
-            className="p-3 text-gray-400 hover:bg-white hover:text-indigo-600 hover:shadow-md rounded-2xl transition-all"
-          >
-            <Plus onClick={addQuestion} className="w-6 h-6" />
-          </button>
         </div>
 
         <div className="flex items-center gap-10">
