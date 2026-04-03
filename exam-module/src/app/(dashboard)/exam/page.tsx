@@ -276,16 +276,45 @@ export default function ShalgaltPage() {
 
   //duusla
 
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!viewerSession) return;
+    const endMs = new Date(viewerSession.endTime).getTime();
+
+    const format = () => {
+      const diff = endMs - (performance.timeOrigin + performance.now());
+      if (diff <= 0) return "00:00";
+      const hrs = Math.floor(diff / 3_600_000);
+      const mins = Math.floor((diff % 3_600_000) / 60_000);
+      const secs = Math.floor((diff % 60_000) / 1_000);
+      return hrs > 0
+        ? `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`
+        : `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    };
+
+    const initId = setTimeout(() => setTimeLeft(format()), 0);
+    const intervalId = setInterval(() => setTimeLeft(format()), 1_000);
+    return () => {
+      clearTimeout(initId);
+      clearInterval(intervalId);
+    };
+  }, [viewerSession]);
+
   useProctorLogsPusher(true, onNewLog);
 
   const proctorLogsAside = (
     <aside className="w-full shrink-0 rounded-[28px] bg-[#F7F7FB] p-4 xl:sticky xl:top-6 xl:h-[calc(100vh-120px)] xl:w-[340px] xl:overflow-hidden">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-gray-800">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#36C38A]" />
-          <span className="font-medium">Үлдсэн хугацаа: 25:00</span>
+      {viewerSession && timeLeft !== null && (
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-gray-800">
+            <span
+              className={`h-2.5 w-2.5 rounded-full ${timeLeft === "00:00" ? "bg-red-500" : "bg-[#36C38A]"}`}
+            />
+            <span className="font-medium">Үлдсэн хугацаа: {timeLeft}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="mb-4 grid grid-cols-2 gap-3">
         <button
@@ -482,9 +511,6 @@ export default function ShalgaltPage() {
                 <p className="font-medium text-gray-700">
                   Дууссан шалгалтын түүх байхгүй
                 </p>
-                <p className="mt-2 text-sm text-gray-400">
-                  Session-ууд дууссан шалгалтад тохирохгүй байна.
-                </p>
               </div>
             ) : (
               <>
@@ -574,7 +600,7 @@ export default function ShalgaltPage() {
                     {filteredAssignments.ongoing.length === 0 ? (
                       <div className="col-span-full rounded-[24px] border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-gray-500">
                         <p className="font-medium text-gray-700">
-                          Идэвхтэй ExamSession байхгүй
+                          Авагдаж буй шалгалт байхгүй
                         </p>
                         <p className="mt-2 text-sm text-gray-400">
                           Одоогоор эхэлсэн шалгалт харагдахгүй байна.
