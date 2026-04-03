@@ -290,6 +290,7 @@ export default function EditVariationPage() {
   return (
     <div className="p-8 sm:p-10 flex gap-6">
       <div className="flex-1 min-w-0">
+        
         <button
           type="button"
           onClick={() => router.push(`/materials`)}

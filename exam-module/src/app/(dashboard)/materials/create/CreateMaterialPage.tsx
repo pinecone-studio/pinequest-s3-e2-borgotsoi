@@ -436,7 +436,9 @@ export default function CreateMaterialPage() {
                 </div>
 
                 <p className="text-[19px] font-bold text-gray-900 tracking-tight text-center">
-                  {parseStatus === "loading" ? "Ачаалж байна..." : "Боловсруулж байна..."}
+                  {parseStatus === "loading"
+                    ? "Ачаалж байна..."
+                    : "Боловсруулж байна..."}
                 </p>
                 <p className="text-sm text-gray-400 -mt-3 text-center">
                   Хэсэг хугацаа хүлээнэ үү
@@ -447,25 +449,55 @@ export default function CreateMaterialPage() {
                   {/* Step 1 — always done */}
                   <div className="flex items-center gap-3">
                     <span className="w-7 h-7 rounded-full bg-indigo-700 flex items-center justify-center shrink-0">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                      >
+                        <path
+                          d="M2.5 7L5.5 10L11.5 4"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     </span>
-                    <span className="text-sm font-medium text-indigo-700">Файл уншиж байна</span>
+                    <span className="text-sm font-medium text-indigo-700">
+                      Файл уншиж байна
+                    </span>
                   </div>
 
                   {/* Step 2 — done on processing, pending on loading */}
                   <div className="flex items-center gap-3">
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${parseStatus === "processing" ? "bg-indigo-700" : "border-2 border-gray-300"}`}>
+                    <span
+                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${parseStatus === "processing" ? "bg-indigo-700" : "border-2 border-gray-300"}`}
+                    >
                       {parseStatus === "processing" ? (
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                          <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                        >
+                          <path
+                            d="M2.5 7L5.5 10L11.5 4"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       ) : (
-                        <span className="text-xs font-bold text-gray-400">2</span>
+                        <span className="text-xs font-bold text-gray-400">
+                          2
+                        </span>
                       )}
                     </span>
-                    <span className={`text-sm font-medium ${parseStatus === "processing" ? "text-indigo-700" : "text-gray-400"}`}>
+                    <span
+                      className={`text-sm font-medium ${parseStatus === "processing" ? "text-indigo-700" : "text-gray-400"}`}
+                    >
                       Текст задлаж байна
                     </span>
                   </div>
@@ -485,7 +517,9 @@ export default function CreateMaterialPage() {
                 <div className="w-full h-1 bg-gray-100 rounded-full mt-1 overflow-hidden">
                   <div
                     className="h-full bg-indigo-600 rounded-full transition-all duration-700"
-                    style={{ width: parseStatus === "processing" ? "66%" : "33%" }}
+                    style={{
+                      width: parseStatus === "processing" ? "66%" : "33%",
+                    }}
                   />
                 </div>
               </>
@@ -870,11 +904,17 @@ export default function CreateMaterialPage() {
               <>
                 <div className="flex items-center justify-center w-20 h-20 rounded-full bg-indigo-50 mb-1">
                   <svg
-                    width="44" height="46" viewBox="0 0 44 46" fill="none"
+                    width="44"
+                    height="46"
+                    viewBox="0 0 44 46"
+                    fill="none"
                     className="animate-spin"
                     style={{ animationDuration: "1.4s" }}
                   >
-                    <path d="M19.9577 1.1197C20.8976 -0.373232 23.1024 -0.373235 24.0423 1.1197L26.2952 4.69831C26.9131 5.67983 28.1596 6.07887 29.2451 5.64264L33.2027 4.05214C34.8538 3.38861 36.6375 4.66539 36.5072 6.41747L36.1948 10.6173C36.1091 11.7692 36.8796 12.8139 38.018 13.0896L42.1687 14.0947C43.9003 14.514 44.5816 16.5799 43.4309 17.9219L40.6725 21.1387C39.916 22.021 39.916 23.3123 40.6725 24.1946L43.4309 27.4114C44.5816 28.7535 43.9003 30.8193 42.1687 31.2386L38.018 32.2438C36.8796 32.5194 36.1091 33.5642 36.1948 34.716L36.5072 38.9159C36.6375 40.668 34.8538 41.9447 33.2027 41.2812L29.2451 39.6907C28.1596 39.2545 26.9131 39.6535 26.2952 40.635L24.0423 44.2136C23.1024 45.7066 20.8976 45.7066 19.9577 44.2136L17.7048 40.635C17.0869 39.6535 15.8404 39.2545 14.7549 39.6907L10.7973 41.2812C9.14619 41.9447 7.36249 40.668 7.49281 38.9159L7.80517 34.716C7.89085 33.5642 7.12044 32.5194 5.98202 32.2438L1.83131 31.2386C0.0997135 30.8193 -0.581601 28.7535 0.569126 27.4114L3.32746 24.1946C4.08399 23.3123 4.08399 22.021 3.32746 21.1387L0.569128 17.9219C-0.581599 16.5799 0.0997107 14.514 1.83131 14.0947L5.98201 13.0896C7.12044 12.8139 7.89085 11.7692 7.80517 10.6173L7.49281 6.41748C7.36249 4.66539 9.14619 3.38861 10.7972 4.05214L14.7549 5.64264C15.8404 6.07887 17.0869 5.67983 17.7048 4.69831L19.9577 1.1197Z" fill="#6750A4"/>
+                    <path
+                      d="M19.9577 1.1197C20.8976 -0.373232 23.1024 -0.373235 24.0423 1.1197L26.2952 4.69831C26.9131 5.67983 28.1596 6.07887 29.2451 5.64264L33.2027 4.05214C34.8538 3.38861 36.6375 4.66539 36.5072 6.41747L36.1948 10.6173C36.1091 11.7692 36.8796 12.8139 38.018 13.0896L42.1687 14.0947C43.9003 14.514 44.5816 16.5799 43.4309 17.9219L40.6725 21.1387C39.916 22.021 39.916 23.3123 40.6725 24.1946L43.4309 27.4114C44.5816 28.7535 43.9003 30.8193 42.1687 31.2386L38.018 32.2438C36.8796 32.5194 36.1091 33.5642 36.1948 34.716L36.5072 38.9159C36.6375 40.668 34.8538 41.9447 33.2027 41.2812L29.2451 39.6907C28.1596 39.2545 26.9131 39.6535 26.2952 40.635L24.0423 44.2136C23.1024 45.7066 20.8976 45.7066 19.9577 44.2136L17.7048 40.635C17.0869 39.6535 15.8404 39.2545 14.7549 39.6907L10.7973 41.2812C9.14619 41.9447 7.36249 40.668 7.49281 38.9159L7.80517 34.716C7.89085 33.5642 7.12044 32.5194 5.98202 32.2438L1.83131 31.2386C0.0997135 30.8193 -0.581601 28.7535 0.569126 27.4114L3.32746 24.1946C4.08399 23.3123 4.08399 22.021 3.32746 21.1387L0.569128 17.9219C-0.581599 16.5799 0.0997107 14.514 1.83131 14.0947L5.98201 13.0896C7.12044 12.8139 7.89085 11.7692 7.80517 10.6173L7.49281 6.41748C7.36249 4.66539 9.14619 3.38861 10.7972 4.05214L14.7549 5.64264C15.8404 6.07887 17.0869 5.67983 17.7048 4.69831L19.9577 1.1197Z"
+                      fill="#6750A4"
+                    />
                   </svg>
                 </div>
                 <p className="text-[20px] font-bold text-gray-900 tracking-tight">
@@ -888,11 +928,17 @@ export default function CreateMaterialPage() {
               <>
                 <div className="flex items-center justify-center w-20 h-20 rounded-full bg-indigo-50 mb-1">
                   <svg
-                    width="44" height="46" viewBox="0 0 44 46" fill="none"
+                    width="44"
+                    height="46"
+                    viewBox="0 0 44 46"
+                    fill="none"
                     className="animate-spin"
                     style={{ animationDuration: "1.4s" }}
                   >
-                    <path d="M19.9577 1.1197C20.8976 -0.373232 23.1024 -0.373235 24.0423 1.1197L26.2952 4.69831C26.9131 5.67983 28.1596 6.07887 29.2451 5.64264L33.2027 4.05214C34.8538 3.38861 36.6375 4.66539 36.5072 6.41747L36.1948 10.6173C36.1091 11.7692 36.8796 12.8139 38.018 13.0896L42.1687 14.0947C43.9003 14.514 44.5816 16.5799 43.4309 17.9219L40.6725 21.1387C39.916 22.021 39.916 23.3123 40.6725 24.1946L43.4309 27.4114C44.5816 28.7535 43.9003 30.8193 42.1687 31.2386L38.018 32.2438C36.8796 32.5194 36.1091 33.5642 36.1948 34.716L36.5072 38.9159C36.6375 40.668 34.8538 41.9447 33.2027 41.2812L29.2451 39.6907C28.1596 39.2545 26.9131 39.6535 26.2952 40.635L24.0423 44.2136C23.1024 45.7066 20.8976 45.7066 19.9577 44.2136L17.7048 40.635C17.0869 39.6535 15.8404 39.2545 14.7549 39.6907L10.7973 41.2812C9.14619 41.9447 7.36249 40.668 7.49281 38.9159L7.80517 34.716C7.89085 33.5642 7.12044 32.5194 5.98202 32.2438L1.83131 31.2386C0.0997135 30.8193 -0.581601 28.7535 0.569126 27.4114L3.32746 24.1946C4.08399 23.3123 4.08399 22.021 3.32746 21.1387L0.569128 17.9219C-0.581599 16.5799 0.0997107 14.514 1.83131 14.0947L5.98201 13.0896C7.12044 12.8139 7.89085 11.7692 7.80517 10.6173L7.49281 6.41748C7.36249 4.66539 9.14619 3.38861 10.7972 4.05214L14.7549 5.64264C15.8404 6.07887 17.0869 5.67983 17.7048 4.69831L19.9577 1.1197Z" fill="#6750A4"/>
+                    <path
+                      d="M19.9577 1.1197C20.8976 -0.373232 23.1024 -0.373235 24.0423 1.1197L26.2952 4.69831C26.9131 5.67983 28.1596 6.07887 29.2451 5.64264L33.2027 4.05214C34.8538 3.38861 36.6375 4.66539 36.5072 6.41747L36.1948 10.6173C36.1091 11.7692 36.8796 12.8139 38.018 13.0896L42.1687 14.0947C43.9003 14.514 44.5816 16.5799 43.4309 17.9219L40.6725 21.1387C39.916 22.021 39.916 23.3123 40.6725 24.1946L43.4309 27.4114C44.5816 28.7535 43.9003 30.8193 42.1687 31.2386L38.018 32.2438C36.8796 32.5194 36.1091 33.5642 36.1948 34.716L36.5072 38.9159C36.6375 40.668 34.8538 41.9447 33.2027 41.2812L29.2451 39.6907C28.1596 39.2545 26.9131 39.6535 26.2952 40.635L24.0423 44.2136C23.1024 45.7066 20.8976 45.7066 19.9577 44.2136L17.7048 40.635C17.0869 39.6535 15.8404 39.2545 14.7549 39.6907L10.7973 41.2812C9.14619 41.9447 7.36249 40.668 7.49281 38.9159L7.80517 34.716C7.89085 33.5642 7.12044 32.5194 5.98202 32.2438L1.83131 31.2386C0.0997135 30.8193 -0.581601 28.7535 0.569126 27.4114L3.32746 24.1946C4.08399 23.3123 4.08399 22.021 3.32746 21.1387L0.569128 17.9219C-0.581599 16.5799 0.0997107 14.514 1.83131 14.0947L5.98201 13.0896C7.12044 12.8139 7.89085 11.7692 7.80517 10.6173L7.49281 6.41748C7.36249 4.66539 9.14619 3.38861 10.7972 4.05214L14.7549 5.64264C15.8404 6.07887 17.0869 5.67983 17.7048 4.69831L19.9577 1.1197Z"
+                      fill="#6750A4"
+                    />
                   </svg>
                 </div>
                 <p className="text-[20px] font-bold text-gray-900 tracking-tight">
@@ -1274,7 +1320,13 @@ export default function CreateMaterialPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-700 transition-colors mb-6"
+          >
+            <span>←</span> Буцах
+          </button>
+          <h1 className="text-[24px] font-semibold text-gray-900 ">
             Шалгалтын материал үүсгэх
           </h1>
           <p className="text-sm text-gray-500">
@@ -1291,7 +1343,7 @@ export default function CreateMaterialPage() {
               setParseStatus(demoPhases[nextIdx]);
               setParseError("Тест алдааны мессеж");
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-indigo-400 bg-indigo-50 text-sm text-indigo-700 font-semibold hover:bg-indigo-100"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-indigo-400 bg-indigo-50 text-sm text-indigo-700 font-semibold hover:bg-indigo-100"
           >
             👻 Overlay харах ({demoPhases[demoPhaseIdx]})
           </button>
@@ -1299,7 +1351,7 @@ export default function CreateMaterialPage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="px-6 py-2.5 rounded-lg bg-indigo-900 text-sm text-white font-medium hover:bg-indigo-800 disabled:opacity-50 disabled:pointer-events-none"
+            className="px-6 py-2.5 rounded-full bg-[#21005D] text-sm text-white font-medium  disabled:opacity-50 disabled:pointer-events-none"
           >
             {saving ? "Хадгалж байна…" : "Хадгалах"}
           </button>
@@ -1313,7 +1365,7 @@ export default function CreateMaterialPage() {
       )}
 
       {/* Form card */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+      <div className="bg-white border border-l-6 border-l-[#E1DFF9]  border-gray-200 rounded-xl p-6 mb-6">
         <div className="grid gap-4 sm:grid-cols-3 mb-4">
           <label className="flex flex-col gap-1.5 text-sm">
             <span className="text-gray-600 font-medium">Материалын нэр*</span>
@@ -1346,7 +1398,7 @@ export default function CreateMaterialPage() {
             </select>
           </label>
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="text-gray-600 font-medium">Анги*</span>
+            <span className="text-gray-600 font-medium">Сэдэв*</span>
             <select
               value={topicId}
               onChange={(e) => setTopicId(e.target.value)}
@@ -1385,7 +1437,10 @@ export default function CreateMaterialPage() {
               className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${isPublic ? "translate-x-6" : "translate-x-1"}`}
             />
           </span>
-          <span className="text-sm font-medium text-gray-700">Public</span>
+          <span className="text-sm font-medium text-gray-700">
+            {" "}
+            Нийтэд нээлттэй
+          </span>
         </button>
       </div>
 
@@ -1454,30 +1509,7 @@ export default function CreateMaterialPage() {
               </svg>
               Асуулт нэмэх
             </button>
-            <button
-              type="button"
-              onClick={fillDemoMathExam}
-              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 hover:bg-gray-50 font-medium"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <rect
-                  x="3"
-                  y="3"
-                  width="18"
-                  height="18"
-                  rx="2"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M8 12h8M12 8v8"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-              Зураг оруулах
-            </button>
+
             <button
               type="button"
               onClick={() =>
@@ -1506,7 +1538,7 @@ export default function CreateMaterialPage() {
                 setParseStatus(demoPhases[nextIdx]);
                 setParseError("Тест алдааны мессеж");
               }}
-              className="flex items-center gap-2 px-4 py-2.5 border border-indigo-300 rounded-lg bg-indigo-50 text-sm text-indigo-700 hover:bg-indigo-100 font-medium"
+              className="flex items-center gap-2 px-4 py-2 border border-indigo-300 rounded-lg bg-indigo-50 text-sm text-indigo-700 hover:bg-indigo-100 font-medium"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <circle
@@ -1524,6 +1556,13 @@ export default function CreateMaterialPage() {
                 />
               </svg>
               Overlay харах
+            </button>
+            <button
+              type="button"
+              onClick={fillDemoMathExam}
+              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 hover:bg-gray-50 font-medium"
+            >
+              demo data
             </button>
           </div>
         </div>
