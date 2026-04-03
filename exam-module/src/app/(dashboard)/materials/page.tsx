@@ -20,14 +20,21 @@ export default function MaterialsPage() {
   const [activeTab, setActiveTab] = useState<"mine" | "bank">("mine");
   const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
 
+  const [currentUserId] = useState<string | null>(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw).id ?? null : null;
+    } catch {
+      return null;
+    }
+  });
   const [materialSearch, setMaterialSearch] = useState("");
   const [subjectId, setSubjectId] = useState("");
   const [topicId, setTopicId] = useState("");
-  const [classId, setClassId] = useState("");
 
-  const { data: classesData } = useGetClassesQuery();
+  useGetClassesQuery();
 
-  const { data, loading, error } = useGetExamssQueryQuery({
+  const { data, loading } = useGetExamssQueryQuery({
     fetchPolicy: "cache-and-network",
   });
 
@@ -40,8 +47,6 @@ export default function MaterialsPage() {
     skip: !subjectId,
   });
 
-  useGetClassesQuery();
-
   const showFilters = activeTab === "bank";
 
   const filteredMaterials = useMemo(() => {
@@ -50,6 +55,7 @@ export default function MaterialsPage() {
 
     return exams
       .filter((exam) => {
+        if (activeTab === "mine" && exam.creatorId !== currentUserId) return false;
         if (activeTab === "bank" && !exam.isPublic) return false;
 
         if (q && !exam.name.toLowerCase().includes(q)) return false;
@@ -67,7 +73,7 @@ export default function MaterialsPage() {
         date: formatExamCardDate(exam.createdAt),
         gradient: gradientForExamId(exam.id),
       }));
-  }, [data?.exams, activeTab, materialSearch, subjectId, topicId, showFilters]);
+  }, [data?.exams, activeTab, materialSearch, subjectId, topicId, showFilters, currentUserId]);
 
   return (
     <div className="bg-white p-6 px-10 min-h-screen">
@@ -139,6 +145,20 @@ export default function MaterialsPage() {
                   {optionsData?.subjects?.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
+              </div>
+              <div className="relative w-[222px]">
+                <select
+                  defaultValue=""
+                  className="w-full h-[36px] px-4 bg-white border border-slate-200 rounded-xl text-sm appearance-none focus:ring-2 focus:ring-indigo-500/20 outline-none font-medium text-slate-600"
+                >
+                  <option value="">Анги сонгох</option>
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}-р анги
                     </option>
                   ))}
                 </select>
